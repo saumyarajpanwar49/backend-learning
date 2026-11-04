@@ -1,0 +1,34 @@
+
+<---------------------INTRODUCTION TO NODE JS -------------------------------->
+
+1. Node js is not a programming language .
+2. It is also not a technology
+3.it is not a framwork or a library .
+4.JS runtime enviroment 
+        JS se backend nhi ban sakta kyuki js ke pass wo functionalities nhi hai jinse backend banta hai
+        Ryan Dahl isne socha js se backed banna chahiye
+        Google Chrome ka V8 engine ka code open source hai and Ryan Dahl us code me chedkhaani kar rha hai
+        kyuki Chrome V8 engine bana hai c++ me 
+        fir usne socha ki hame to JS me code karna hai
+5. hum JS ka code likhenge jo ki wrapper layer of JS receive karegi and wo code karegi V8 engine ke cpp modules ke sath ak server create karega
+6. V8 + JS wrapper is called NODE JS
+7. Node js is a runtime enviroment jab tak node chal rha tab  hum JS se server create kar sakte hai , jo ki JS ka cod ekhud se nhi kar sakta hai , 
+   node js jab tak chalega tab tak vo al mahol deta hai JS se server banne ka 
+
+
+
+<---------------------HOW TO INSTALL NODE JS AND npm ------------------------------->
+1.search node js install and go to website  https://nodejs.org/en/download
+2.open cmd 
+3.node -v   tells version of node js 
+4.npm -v     what is npm ??? basically it is a pakage installer(npm asi jaagh hai jaha per alag alag prakar ke pakages ko uploaad karte hai means that yoou are borrowing a code)
+5.exit 
+
+<-------------------------working with node and npm------------------------>
+------------NPM INIT----------
+---->>>> npm init  created package.json lekha jokha of the project 
+------------NODE BASIC USAGE------
+
+1.open teriminal(ctrl `)
+2.
+<----------------HOW TO USE MODULES AND    PACKAGES OF NODE JS ------------------->

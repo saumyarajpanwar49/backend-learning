@@ -1,0 +1,7 @@
+protocol  -- rules 
+internet per kuchh bhi karne ke liye rules banaye gaye hai unke dwaara jinhone internet bannaaya hai , ab u rules ko follow karna jaruri hai aur ye rules follow ho appm ke operating system me preinstalled rehte hai
+window me networking related rules preinstalled rehte hai , ex chrome firefox   
+
+<------------WHAT IS HTTP--------->
+http - protocol
+yahi  protocol hai ya rule hai jisko follow kare bina aap internet pe na ahi kuchh bhej sakte ho na hi kuchh maang sakte ho 

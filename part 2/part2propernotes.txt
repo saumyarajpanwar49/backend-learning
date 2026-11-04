@@ -1,0 +1,170 @@
+# NODE.JS NOTES
+
+## 1. INTRODUCTION TO NODE.JS
+
+1. Node.js is not a programming language.
+2. It is not a framework or library.
+3. Node.js is a JavaScript Runtime Environment.
+4. It allows JavaScript to run outside the browser.
+5. JavaScript alone does not provide all the built-in APIs required for backend development.
+
+### History of Node.js
+
+- Created by Ryan Dahl in 2009.
+- Google Chrome uses the V8 JavaScript Engine.
+- V8 is primarily written in C++ and is open source.
+- Ryan Dahl used V8 to execute JavaScript outside the browser.
+- He added additional runtime capabilities such as file system and networking APIs.
+- Node.js was created to enable server-side JavaScript.
+
+### How Node.js Works
+
+1. We write JavaScript code in a .js file.
+2. Node.js runtime executes the code.
+3. V8 Engine executes JavaScript.
+4. Node.js APIs provide additional backend functionality.
+5. libuv handles the event loop and asynchronous I/O.
+
+**Node.js = V8 Engine + Node.js APIs + libuv + Other Components**
+
+### Why Node.js?
+
+Node.js allows JavaScript to:
+- Create HTTP servers.
+- Read and write files.
+- Handle network requests.
+- Communicate with the operating system.
+
+---
+
+## 2. INSTALLATION OF NODE.JS AND NPM
+
+Website: https://nodejs.org/en/download
+
+Installation Steps:
+1. Download Node.js LTS version.
+2. Install Node.js.
+3. Open CMD or VS Code terminal.
+4. Check installation using commands:
+
+node -v  = Check Node.js version.
+
+npm -v = Check NPM version.
+
+exit = Exit terminal session.
+
+### What is NPM?
+
+NPM stands for Node Package Manager.
+
+- It is the default package manager for Node.js.
+- It helps install, update and manage packages.
+- Packages contain reusable code written by developers.
+- NPM Registry is an online platform where developers publish packages.
+
+Website: https://www.npmjs.com/
+
+Examples:
+- Express
+- Nodemon
+- Mongoose
+
+---
+
+## 3. WORKING WITH NODE.JS AND NPM
+
+### NPM INIT
+
+Command: npm init
+
+- Initializes a Node.js project.
+- Creates a package.json file.
+- Asks questions about project configuration.
+
+Shortcut: npm init -y
+
+- Creates package.json automatically using default values.
+
+### What is package.json?
+
+It is a configuration file that stores project information.
+
+Important fields:
+- name = Project name.
+- version = Project version.
+- description = Project description.
+- main = Package entry-point metadata.
+- scripts = Project commands.
+- dependencies = Installed packages.
+
+---
+
+## 4. NODE.JS BASIC USAGE
+
+1. Open VS Code.
+2. Create a project folder.
+3. Create a file named app.js.
+4. Write JavaScript code.
+
+Example:
+
+console.log("Hello World");
+console.log("Welcome to Node.js");
+
+5. Open terminal (Ctrl + `).
+6. Execute:
+
+node app.js
+
+Output:
+Hello World
+Welcome to Node.js
+
+### Important Commands
+
+node -v = Check Node.js version.
+npm -v = Check NPM version.
+npm init = Initialize project.
+npm init -y = Initialize with default values.
+node app.js = Execute JavaScript file.
+npm install express = Install Express.
+npm uninstall express = Uninstall Express.
+
+---
+
+## 5. NODE.JS REPL
+
+REPL stands for:
+
+R = Read
+E = Evaluate
+P = Print
+L = Loop
+
+- REPL is an interactive JavaScript environment.
+- It allows us to execute JavaScript directly in the terminal without creating a file.
+
+Command: node
+
+Example:
+
+> 10 + 20
+30
+
+Exit REPL: .exit
+
+---
+
+## 6. BROWSER JAVASCRIPT VS NODE.JS
+
+Browser JavaScript:
+- Runs inside the browser.
+- Provides DOM APIs.
+- Uses the window object.
+- Primarily used for frontend development.
+
+Node.js:
+- Runs outside the browser.
+- Provides Node.js APIs.
+- Uses the global object.
+- Used for backend development and other applications.
