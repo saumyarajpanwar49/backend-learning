@@ -1,0 +1,300 @@
+NPM (NODE PACKAGE MANAGER)
+==========================
+
+1. UNDERSTANDING NPM
+--------------------
+NPM = Node Package Manager
+
+NPM is used to install, uninstall and manage packages in Node.js.
+
+MODULES:
+Modules provided by Node.js itself are called built-in modules.
+Examples: fs, http, path, os.
+
+PACKAGES:
+Packages are reusable code downloaded from NPM.
+Examples: express, nodemon, mongoose.
+
+
+2. INSTALLING AND UNINSTALLING PACKAGES
+----------------------------------------
+
+1. Install a package:
+   npm install package-name
+
+   Example:
+   npm install express
+
+2. Uninstall a package:
+   npm uninstall package-name
+
+   Example:
+   npm uninstall express
+
+3. Install a particular version:
+   npm install package-name@version
+
+   Example:
+   npm install express@4.18.2
+
+4. Install package globally:
+   npm install -g nodemon
+
+5. Install all dependencies:
+   npm install
+
+
+3. UNDERSTANDING NODE_MODULES
+------------------------------
+node_modules is a folder where NPM stores installed packages
+and their dependencies.
+
+Important files:
+
+1. node_modules:
+   Contains all installed packages.
+
+2. package.json:
+   Contains project information, dependencies and scripts.
+
+3. package-lock.json:
+   Stores exact installed dependency versions.
+
+
+4. DEPENDENCIES VS DEVDEPENDENCIES
+-----------------------------------
+
+DEPENDENCIES:
+Packages required by the application to run in production.
+
+Example:
+npm install express
+
+DEVDEPENDENCIES:
+Packages required only during development, testing or building.
+
+Example:
+npm install nodemon --save-dev
+
+Other examples:
+Dependencies: Express, Mongoose.
+DevDependencies: Nodemon, ESLint, Prettier, Jest.
+
+
+5. UNDERSTANDING PACKAGE.JSON
+------------------------------
+package.json is the main configuration file of a Node.js project.
+
+It contains:
+1. Project name and version.
+2. Dependencies.
+3. DevDependencies.
+4. Scripts.
+5. Other project information.
+
+Example:
+
+{
+  "name": "my-project",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
+
+
+6. UNDERSTANDING NPM SCRIPTS
+-----------------------------
+NPM scripts are commands written inside the scripts section
+of package.json.
+
+Example:
+
+"scripts": {
+  "start": "node app.js",
+  "dev": "nodemon app.js",
+  "test": "node test.js"
+}
+
+To execute:
+
+npm start
+npm run dev
+npm test
+
+WHY SOMETIMES npm run IS USED AND SOMETIMES NOT?
+
+NPM provides shortcuts for some predefined script names.
+
+npm start       --> Runs start script.
+npm test        --> Runs test script.
+npm stop        --> Runs stop script.
+npm restart     --> Runs restart script.
+
+For custom scripts, we generally use npm run.
+
+npm run dev
+npm run build
+npm run watch
+
+Remember:
+Predefined scripts have shortcuts.
+Custom scripts generally require npm run.
+
+
+7. UNDERSTANDING PACKAGE-LOCK.JSON
+------------------------------------
+package-lock.json is automatically created or updated when
+we install packages.
+
+Its uses:
+1. Stores exact package versions.
+2. Maintains dependency consistency.
+3. Helps developers install the same dependency tree.
+4. Makes installation more reliable.
+
+
+8. IMPORTANT NPM COMMANDS
+--------------------------
+
+npm init              --> Creates package.json.
+npm init -y           --> Creates package.json with default values.
+npm install           --> Installs all dependencies.
+npm uninstall         --> Uninstalls a package.
+npm update            --> Updates dependencies.
+npm list              --> Displays installed packages.
+npm list --depth=0    --> Displays top-level packages.
+npm outdated          --> Checks outdated packages.
+npm audit             --> Checks security vulnerabilities.
+npm audit fix         --> Fixes compatible vulnerabilities.
+npm cache verify      --> Verifies NPM cache.
+npm run               --> Displays available scripts.
+
+
+9. IMPORTANT CONCEPTS
+----------------------
+
+1. NPM Registry:
+   Online database from where NPM downloads packages.
+
+2. NPX:
+   Executes packages without requiring a separate global
+   installation.
+
+   Example:
+   npx create-vite@latest
+
+3. Semantic Versioning:
+   Version format = MAJOR.MINOR.PATCH
+
+   Example: 4.18.2
+
+4. Global Installation:
+   Installs packages system-wide.
+   Example: npm install -g nodemon
+
+5. Local Installation:
+   Installs packages inside the current project.
+
+
+10. PRACTICAL WORKFLOW
+-----------------------
+
+Step 1: Create a project.
+mkdir my-project
+
+Step 2: Enter the project.
+cd my-project
+
+Step 3: Initialize NPM.
+npm init -y
+
+Step 4: Install Express.
+npm install express
+
+Step 5: Install Nodemon.
+npm install nodemon --save-dev
+
+Step 6: Add scripts in package.json.
+
+"scripts": {
+  "start": "node app.js",
+  "dev": "nodemon app.js"
+}
+
+Step 7: Run the application.
+
+npm start
+
+During development:
+npm run dev
+
+11. HOW TO CREATE A CUSTOM NPM SCRIPT
+--------------------------------------
+
+We can create our own scripts inside the "scripts" object
+of package.json.
+
+STEP 1: Open package.json.
+
+STEP 2: Find the "scripts" section.
+
+STEP 3: Add your custom script.
+
+Example:
+
+{
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "hello": "node app.js"
+  }
+}
+
+STEP 4: Run the custom script.
+
+npm run hello
+
+IMPORTANT:
+1. Custom scripts are created inside package.json.
+2. Use npm run script-name to execute custom scripts.
+3. npm run hello executes the command written against "hello".
+4. You do not need to install anything to create a custom script.
+
+ANOTHER EXAMPLE:
+
+"scripts": {
+  "start": "node app.js",
+  "dev": "nodemon app.js",
+  "build": "echo Building Project",
+  "watch": "node app.js"
+}
+
+To execute:
+
+npm run build
+npm run watch
+
+NOTE:
+"build", "watch" and "hello" are custom script names.
+You can create any valid script name according to your needs.
+
+
+IMPORTANT POINTS TO REMEMBER
+-----------------------------
+
+1. package.json = Project information and dependency list.
+2. package-lock.json = Exact dependency versions.
+3. node_modules = Actual installed packages.
+4. Dependencies = Required to run the application.
+5. DevDependencies = Required during development.
+6. npm install = Installs packages.
+7. npm uninstall = Removes packages.
+8. npm run = Executes custom scripts.

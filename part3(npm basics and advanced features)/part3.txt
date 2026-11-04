@@ -1,0 +1,16 @@
+npm - node package manager 
+node js core me jo installed ata hai vo kahlate hai modules 
+npm se download karte hai vo hota hai package 
+
+<-----------INSTALLING AND UNISTALLING ANYTHING BASICS AND ADVANCED FROM NPM--------------------->
+1. install --> npm install packagekanaam
+2.unistalling --> npm unistall packagekanaam
+3. perticular version install --> npm unistall packagekanaam@version
+ <-----------UNDERSTANDING NODE MODULES ------------>
+ DEPENDENCIES - packages and packages ki dependencies
+ DEVDEPENDENCIES - aise packages jo sirf devlopment me kaam ayenge per jab aap ban jayega aur upload/deploy ho jayega tab hum in packages ko use nhi kar rahe honge
+ <------------SCRIPTS------------->
+ kai baar aap koi script chalate ho aur app us script me likhte ho ye command 
+ npm start
+ npm run dev
+kai baar run likhte hai aur kai baar nhi asa kyu ??????--jab aapp do script use karteb ho (start or test) 
