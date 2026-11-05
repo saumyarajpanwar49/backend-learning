@@ -1,0 +1,245 @@
+# EXPRESS.JS FRAMEWORK
+
+## 1. INTRODUCTION TO EXPRESS.JS
+
+- Express.js is a Node.js web framework available as an NPM package.
+- It simplifies backend development using JavaScript.
+- It handles HTTP requests and sends HTTP responses.
+- It provides routing, middleware, request handling and error handling.
+- It is minimal and flexible, so developers can design their own application structure.
+
+**Example:** Node.js provides the runtime; Express.js simplifies building web servers and APIs.
+
+## 2. SETTING UP A BASIC EXPRESS APPLICATION
+
+1. Install Express: `npm install express`
+2. Enable ES Modules using `"type": "module"` in package.json.
+3. Import Express and create an application.
+
+```javascript
+import express from 'express';
+
+const app = express();
+
+app.listen(3000, () => {
+    console.log("Server running on port 3000");
+});
+```
+
+- `express()` → Creates an Express application.
+- `app.listen()` → Starts the server on a specified port.
+
+## 3. ROUTING
+
+- Routing determines how an application responds to client requests based on the URL and HTTP method.
+- Each route performs a specific task.
+
+**HTTP Methods:**
+- GET → Retrieve data.
+- POST → Create data.
+- PUT → Replace existing data.
+- PATCH → Partially update data.
+- DELETE → Delete data.
+
+```javascript
+app.get('/', (req, res) => {
+    res.send("Home Page");
+});
+
+app.post('/users', (req, res) => {
+    res.send("User Created");
+});
+```
+
+# EXPRESS.JS MIDDLEWARE – NOTES
+
+## 1. What is Middleware?
+- Middleware is a function that executes between the request and response.
+- It can access `req`, `res` and `next`.
+- It can modify data, execute logic, send a response or pass control.
+
+Syntax:
+```js
+app.use((req, res, next) => {
+    console.log("Request received");
+    next();
+});
+```
+
+## 2. Why Middleware?
+- Authentication and authorization.
+- Request logging.
+- Parsing request data.
+- Error handling.
+- Serving static files.
+
+## 3. Types of Middleware
+
+**1. Application-Level:** Attached to the Express app using `app.use()` or `app.METHOD()`.
+
+**2. Router-Level:** Attached to a specific router using `router.use()`.
+
+**3. Built-in:** Provided by Express.
+```js
+app.use(express.json());                 // Parse JSON
+app.use(express.urlencoded({ extended: true })); // Parse form data
+app.use(express.static('public'));       // Serve static files
+```
+
+**4. Third-Party:** Installed using npm.
+```bash
+npm install morgan
+```
+```js
+import morgan from 'morgan';
+app.use(morgan('dev')); // Log requests
+```
+
+**5. Error-Handling:** Handles application errors. Has four parameters.
+```js
+app.use((err, req, res, next) => {
+    res.status(500).send("Server Error");
+});
+```
+
+## 4. Middleware-Related Methods
+
+**a. `app.use()`** – Registers application middleware.
+```js
+app.use((req, res, next) => next());
+```
+
+**b. `app.all()`** – Runs for all HTTP methods on a matching path.
+```js
+app.all('/user', (req, res, next) => next());
+```
+
+**c. `app.param()`** – Runs a callback when a route parameter is matched.
+```js
+app.param('id', (req, res, next, id) => {
+    console.log(id);
+    next();
+});
+```
+
+**d. `router.use()`** – Registers middleware on a router.
+```js
+router.use((req, res, next) => next());
+```
+
+**e. `router.param()`** – Runs a callback for a matching router parameter.
+```js
+router.param('id', (req, res, next, id) => next());
+```
+
+## f. next() Function
+
+- `next()` – Passes control to the next middleware.
+- `next(err)` – Passes an error to error-handling middleware.
+- `next('route')` – Skips remaining callbacks of the current route.
+- `next('router')` – Exits the current router.
+
+## g. Middleware Execution Order
+
+- Middleware executes in registration order.
+- `next()` moves execution forward.
+- Without `next()` or a response, the request may remain pending.
+
+Example:
+```js
+app.use((req, res, next) => {
+    console.log("First");
+    next();
+});
+
+app.use((req, res, next) => {
+    console.log("Second");
+    next();
+});
+
+app.get('/', (req, res) => {
+    res.send("Home Page");
+});
+```
+
+## h. app.use() vs app.get()
+
+- `app.use()` – Registers middleware; can apply across HTTP methods.
+- `app.get()` – Defines a route that handles GET requests.
+
+**Important:** `next()` and its variations are control functions, not Express methods.
+```
+
+**Types:**
+- Application-level middleware.
+- Router-level middleware.
+- Built-in middleware.
+- Third-party middleware.
+- Error-handling middleware.
+
+## 5. REQUEST AND RESPONSE HANDLING
+
+**Request (req):** Contains information sent by the client.
+
+- `req.params` → URL parameters.
+- `req.query` → Query string parameters.
+- `req.body` → Request body.
+- `req.headers` → Request headers.
+
+**Response (res):** Used by the server to respond to the client.
+
+- `res.send()` → Sends a response.
+- `res.json()` → Sends JSON data.
+- `res.status()` → Sets HTTP status code.
+- `res.redirect()` → Redirects the client.
+
+**Example:**
+```javascript
+app.get('/user/:id', (req, res) => {
+    res.json({
+        userId: req.params.id
+    });
+});
+```
+
+## 6. ERROR HANDLING
+
+- Error handling manages unexpected errors during request processing.
+- It prevents application crashes and provides meaningful error responses.
+- Express uses special error-handling middleware with four parameters.
+
+```javascript
+app.use((err, req, res, next) => {
+    console.error(err);
+
+    res.status(500).json({
+        message: "Internal Server Error"
+    });
+});
+```
+
+## 7. INDUSTRIAL-LEVEL EXAMPLE
+
+**Example: E-commerce REST API**
+
+Express.js can be used to build backend APIs for an e-commerce application.
+
+- Authentication → Login and registration.
+- Products → GET, POST, PUT and DELETE products.
+- Orders → Create and manage orders.
+- Middleware → Authentication and authorization.
+- Database → Store users, products and orders.
+- Error Handling → Handle invalid requests and server errors.
+
+**Typical Request Flow:**
+
+Client → Request → Middleware → Authentication → Route → Controller → Database → Response → Client
+
+**Real-world architecture:**
+- Routes → Define API endpoints.
+- Controllers → Handle application logic.
+- Models → Manage database operations.
+- Middleware → Handle common request-processing tasks.
+- Config → Store database and application configuration.
+
+**Conclusion:** Express.js makes it easier to build scalable backend applications and REST APIs using Node.js.

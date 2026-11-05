@@ -1,0 +1,17 @@
+<------------EXPRESS.JS FRAMEWORK--------------->
+<-------------INTRODUCTION TO EXPRESS.JS-------------->
+express.js ak npm package hai
+~it is a framework -> jo apko bataata hai kya chiz/work karna hai flow folow karna padega
+~manages evevry thing from receiving the request and giving the response 
+~ex :- 
+<-------------SETTING UP A BASIC EXPRESS APPLICATION-------------->
+
+<-------------ROUTING-------------->
+route means the part of link except domain -- shreyians.com/profile  (route = /profile)
+
+<-------------MIDDLEWARE-------------->
+jab bhi server request accept karta hai waha se route ke beech pahuchne tak agar aap us requestko beechme rokte ho aur kuchh perform karte ho , to ye elemnt middleware kehlaata hai
+uses 
+<-------------REQUEST AND RESPONSE HANDLING -------------->
+<-------------ERROR HANDLING-------------->
+<-------------EXAMPLE WITH INDUSTRIAL PURPOSE-------------->
