@@ -51,7 +51,7 @@ app.post('/users', (req, res) => {
 });
 ```
 
-# EXPRESS.JS MIDDLEWARE – NOTES
+## 4. EXPRESS.JS MIDDLEWARE – NOTES
 
 ## 1. What is Middleware?
 - Middleware is a function that executes between the request and response.
