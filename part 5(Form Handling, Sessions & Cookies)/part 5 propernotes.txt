@@ -1,0 +1,123 @@
+# FORM HANDLING AND WORKING WITH FORMS
+
+1. Form handling means handling the data submitted through forms on the backend.
+2. It ensures that data coming from any frontend technology (HTML, React, Angular, Vue, templating engines, etc.) can be properly received and processed by the backend.
+3. The backend is responsible for processing, validating, and handling the submitted form data.
+
+# SESSION AND COOKIE
+
+**1. Cookie**
+- A cookie is a small piece of data stored in the user's browser.
+- We can store information on the frontend (browser) using cookies.
+- Whenever the browser makes a request to the same server, matching cookies are automatically sent along with the request.
+- Cookies are commonly used for authentication, user preferences, and session identification.
+
+**2. Session**
+- A session represents a user's interaction with the server.
+- It helps the server remember a user across multiple requests.
+- A session is generally maintained using a unique Session ID stored in a cookie.
+- The actual session data is usually stored on the server.
+- When a request comes from the browser, the cookie containing the Session ID is sent to the server.
+- The server uses that ID to identify the corresponding session and retrieve its data.
+
+**Working of Session and Cookie:**
+1. The user sends a request to the server.
+2. The server creates a session and generates a unique Session ID.
+3. The server sends the Session ID to the browser through a cookie.
+4. The browser stores the cookie.
+5. Whenever the browser sends another request to the same server, it automatically sends the cookie.
+6. The server reads the Session ID and identifies the user's session.
+
+**Difference:**
+- Cookie = Data stored in the browser.
+- Session = User-related data maintained on the server.
+- Cookie helps identify the session, while the session helps the server remember the user.
+
+# EXPRESS.JSON() AND EXPRESS.URLENCODED()
+
+When data is sent from the frontend to the backend, it may arrive in a format that is not directly readable as a JavaScript object.
+
+Express provides middleware to parse incoming request bodies and convert them into readable JavaScript objects.
+
+**1. express.json()**
+- It is built-in Express middleware.
+- It parses incoming JSON-formatted request data.
+- It converts JSON data into a JavaScript object.
+- The parsed data becomes available in `req.body`.
+
+Example:
+```js
+app.use(express.json());
+```
+
+Frontend JSON data:
+```json
+{
+    "name": "Saumyaraj",
+    "age": 19
+}
+```
+
+Backend:
+```js
+app.post("/user", (req, res) => {
+    console.log(req.body);
+});
+```
+
+**2. express.urlencoded()**
+- It is built-in Express middleware.
+- It parses incoming URL-encoded form data.
+- It converts the submitted form data into a readable JavaScript object.
+- The parsed data becomes available in `req.body`.
+- It is commonly used with HTML forms.
+
+Example:
+```js
+app.use(express.urlencoded({ extended: true }));
+```
+
+HTML Form:
+```html
+<form action="/submit" method="POST">
+    <input type="text" name="username">
+    <input type="email" name="email">
+    <button type="submit">Submit</button>
+</form>
+```
+
+Backend:
+```js
+app.post("/submit", (req, res) => {
+    console.log(req.body);
+});
+```
+
+**Difference:**
+
+- `express.json()` → Handles JSON data.
+- `express.urlencoded()` → Handles URL-encoded form data.
+
+**Important:**
+- Both are built-in Express middleware.
+- Both parse incoming request body data.
+- Both make the parsed data available through `req.body`.
+- These middleware functions should be registered before the routes that need to access `req.body`.
+
+Example:
+```js
+const express = require("express");
+const app = express();
+
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Route
+app.post("/submit", (req, res) => {
+    console.log(req.body);
+    res.send("Data received successfully");
+});
+
+app.listen(3000);
+```

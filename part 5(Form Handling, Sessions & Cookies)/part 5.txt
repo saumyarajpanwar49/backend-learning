@@ -1,0 +1,10 @@
+<----------form handling and working with the forms--------->
+handle backend process of forms and making sure the data coming from any frontend library , framework , templating engines , we still handle it in the backend
+
+<---------- Session and Cookie --------->
+hum log kuchh bhi data frontend par bowser par rakh sakte hai and jab bhi aap kuchh bhi request backend par karoge wo frontend par saved data automatically backend par chala jaayega
+Session means jo ye aapp server se connected ho us cookie ke base pe
+Cookie means jo frontend pe saved hai 
+
+<--------express.json and express.urlencoded--------->
+ tumne bheja tha plain text par server ko mila blob which is not direclty readable ab is chiz ko handle karna padega ki hum us blob ko waaps se readable kar sake 
