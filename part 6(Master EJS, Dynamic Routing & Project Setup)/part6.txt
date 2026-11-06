@@ -1,0 +1,30 @@
+initialize a project with npm
+express install
+
+setting up parsers for form  
+           app.use(express.json());
+           app.use(express.urlencoded({extended : true}));
+
+what is EJS ???????????
+setting up ejs for ejs pages
+           install ejs from npm
+           setup ejs as a view engine
+
+
+setting up public static files
+
+dynamic routing
+   dynamic routing
+   how to get data coming from frontend at backend route
+
+hum log kai baar kuchh routes dekhte hai  usmein sirf ek hi hissa change hota hau  
+/author/harsh
+/author/harshita
+/author/harshika
+/author/harshitkadost
+
+sabse pehle browser per jao
+url likhiye apna jo aapko chahiye and enter dabaaiye 
+ab us url ko create kariye
+respone bhejiye kuchh bhi 
+ab usi url ko agar dynamic banana hai to realise karo konsa part dynamic hai aur us pat ke route me : laga do
