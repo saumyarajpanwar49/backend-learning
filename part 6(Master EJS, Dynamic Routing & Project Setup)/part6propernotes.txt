@@ -1,0 +1,514 @@
+EXPRESS.JS – PROJECT SETUP, EJS, STATIC FILES & DYNAMIC ROUTING
+
+==================================================
+1. INITIALIZE A NODE.JS PROJECT
+==================================================
+
+Command:
+npm init -y
+
+- npm init initializes a Node.js project.
+- -y accepts all default settings.
+- It creates package.json.
+
+==================================================
+2. INSTALL EXPRESS.JS
+==================================================
+
+Command:
+npm install express
+
+Basic setup:
+
+const express = require("express");
+const app = express();
+
+app.listen(3000, () => {
+    console.log("Server running on port 3000");
+});
+
+
+==================================================
+3. SETTING UP BODY PARSERS
+==================================================
+
+Body parsers help Express understand data received from
+the frontend.
+
+A. express.json()
+
+Used to parse incoming JSON data.
+
+app.use(express.json());
+
+Example JSON:
+
+{
+    "name": "Rahul",
+    "age": 20
+}
+
+Access data:
+
+app.post("/user", (req, res) => {
+    console.log(req.body);
+    res.send("Data received");
+});
+
+
+B. express.urlencoded()
+
+Used to parse data submitted through HTML forms.
+
+app.use(express.urlencoded({ extended: true }));
+
+- extended: true allows nested objects and rich data
+  to be parsed.
+- Form data becomes available through req.body.
+
+Example HTML:
+
+<form action="/submit" method="POST">
+    <input type="text" name="username">
+    <button type="submit">Submit</button>
+</form>
+
+Backend:
+
+app.post("/submit", (req, res) => {
+    console.log(req.body.username);
+    res.send("Form submitted");
+});
+
+IMPORTANT:
+Add body parser middleware before routes that use req.body.
+
+
+==================================================
+4. WHAT IS EJS?
+==================================================
+
+EJS stands for Embedded JavaScript.
+
+EJS is a templating engine used to create dynamic HTML
+pages using JavaScript.
+
+Uses:
+- Display dynamic data.
+- Use JavaScript variables in HTML.
+- Apply conditions and loops.
+- Reuse HTML components.
+
+Example:
+
+<h1>Welcome <%= username %></h1>
+
+If username = "Rahul", output will be:
+
+Welcome Rahul
+
+
+==================================================
+5. INSTALL AND SET UP EJS
+==================================================
+
+Install:
+
+npm install ejs
+
+Set EJS as the view engine:
+
+app.set("view engine", "ejs");
+
+Express automatically searches for EJS files inside
+the views folder.
+
+Folder structure:
+
+project/
+|
+|-- views/
+|   |-- home.ejs
+|
+|-- app.js
+|-- package.json
+
+
+Create views/home.ejs:
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home Page</title>
+</head>
+<body>
+    <h1>Welcome <%= name %></h1>
+</body>
+</html>
+
+
+Render EJS page:
+
+app.get("/", (req, res) => {
+    res.render("home", { name: "Rahul" });
+});
+
+- res.render() renders an EJS template.
+- "home" refers to home.ejs.
+- The object sends data to the EJS page.
+
+
+==================================================
+6. IMPORTANT EJS TAGS
+==================================================
+
+1. <%= %>
+   Displays escaped output.
+
+   <h1><%= username %></h1>
+
+2. <%- %>
+   Displays unescaped HTML.
+
+   <%- htmlContent %>
+
+   Use only with trusted HTML to avoid XSS attacks.
+
+3. <% %>
+   Executes JavaScript without displaying its result.
+
+   <% let age = 20; %>
+
+4. <%# %>
+   EJS comment. It is not displayed in the output.
+
+
+CONDITIONAL STATEMENT:
+
+<% if (age >= 18) { %>
+    <h2>Eligible</h2>
+<% } else { %>
+    <h2>Not Eligible</h2>
+<% } %>
+
+
+LOOP:
+
+<% users.forEach((user) => { %>
+    <h3><%= user %></h3>
+<% }) %>
+
+
+==================================================
+7. SETTING UP PUBLIC STATIC FILES
+==================================================
+
+Static files are files that the server sends directly
+to the browser.
+
+Examples:
+- CSS
+- JavaScript
+- Images
+- Fonts
+
+Folder structure:
+
+project/
+|
+|-- public/
+|   |-- css/
+|   |   |-- style.css
+|   |
+|   |-- js/
+|   |   |-- script.js
+|   |
+|   |-- images/
+|
+|-- views/
+|   |-- home.ejs
+|
+|-- app.js
+
+
+Configure static files:
+
+app.use(express.static("public"));
+
+Now files inside public can be accessed directly.
+
+Inside home.ejs:
+
+<link rel="stylesheet" href="/css/style.css">
+
+<script src="/js/script.js"></script>
+
+<img src="/images/logo.png" alt="Logo">
+
+IMPORTANT:
+Do not write /public/css/style.css.
+The public folder name is not included in the URL.
+
+
+==================================================
+8. ROUTING IN EXPRESS.JS
+==================================================
+
+Routing determines how the server responds to different
+URLs and HTTP methods.
+
+A. GET ROUTE
+Used to retrieve data.
+
+app.get("/", (req, res) => {
+    res.send("Home Page");
+});
+
+
+B. POST ROUTE
+Used to send data to the server.
+
+app.post("/create", (req, res) => {
+    res.send("Data created");
+});
+
+
+C. PUT ROUTE
+Generally used to replace or update a resource.
+
+app.put("/update", (req, res) => {
+    res.send("Data updated");
+});
+
+
+D. DELETE ROUTE
+Used to delete a resource.
+
+app.delete("/delete", (req, res) => {
+    res.send("Data deleted");
+});
+
+
+==================================================
+9. DYNAMIC ROUTING
+==================================================
+
+Dynamic routing means creating routes that contain
+variable values in their URLs.
+
+Example:
+
+app.get("/user/:username", (req, res) => {
+    res.send(`Welcome ${req.params.username}`);
+});
+
+URL:
+http://localhost:3000/user/rahul
+
+Output:
+Welcome rahul
+
+Explanation:
+
+- :username is a route parameter.
+- req.params contains route parameters.
+- req.params.username retrieves the username.
+
+
+MULTIPLE DYNAMIC PARAMETERS:
+
+app.get("/user/:username/:age", (req, res) => {
+    res.send(
+        `Name: ${req.params.username}, Age: ${req.params.age}`
+    );
+});
+
+URL:
+/user/rahul/20
+
+Output:
+Name: rahul, Age: 20
+
+
+==================================================
+10. GETTING FRONTEND DATA AT THE BACKEND
+==================================================
+
+Express provides three important request properties:
+
+A. req.params
+   Used to get dynamic route parameters.
+
+   URL: /user/rahul
+
+   app.get("/user/:username", (req, res) => {
+       console.log(req.params.username);
+   });
+
+   Output: rahul
+
+
+B. req.query
+   Used to get query string values.
+
+   URL: /search?name=rahul&age=20
+
+   app.get("/search", (req, res) => {
+       console.log(req.query.name);
+       console.log(req.query.age);
+   });
+
+   Output:
+   rahul
+   20
+
+
+C. req.body
+   Used to get data sent inside the request body.
+
+   app.post("/register", (req, res) => {
+       console.log(req.body.username);
+       res.send("Registration successful");
+   });
+
+   Requires the appropriate body parser middleware.
+
+
+==================================================
+11. IMPORTANT RESPONSE METHODS
+==================================================
+
+1. res.send()
+   Sends a response.
+
+   res.send("Hello World");
+
+
+2. res.json()
+   Sends a JSON response.
+
+   res.json({ name: "Rahul", age: 20 });
+
+
+3. res.render()
+   Renders an EJS template.
+
+   res.render("home", { name: "Rahul" });
+
+
+4. res.redirect()
+   Redirects to another URL.
+
+   res.redirect("/");
+
+
+5. res.status()
+   Sets the HTTP status code.
+
+   res.status(404).send("Page Not Found");
+
+
+6. res.sendFile()
+   Sends a file.
+
+   res.sendFile(path.join(__dirname, "public", "index.html"));
+
+
+==================================================
+12. COMPLETE EXPRESS + EJS SETUP
+==================================================
+
+app.js:
+
+const express = require("express");
+const path = require("path");
+
+const app = express();
+
+// Body parsers
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// EJS setup
+app.set("view engine", "ejs");
+
+// Static files
+app.use(express.static(path.join(__dirname, "public")));
+
+// Home route
+app.get("/", (req, res) => {
+    res.render("home", { name: "Rahul" });
+});
+
+// Dynamic route
+app.get("/user/:username", (req, res) => {
+    res.send(`Welcome ${req.params.username}`);
+});
+
+// Query route
+app.get("/search", (req, res) => {
+    res.send(`Searching for ${req.query.name}`);
+});
+
+// Form route
+app.post("/submit", (req, res) => {
+    res.send(`Hello ${req.body.username}`);
+});
+
+// Start server
+app.listen(3000, () => {
+    console.log("Server running at http://localhost:3000");
+});
+
+
+==================================================
+13. QUICK REVISION
+==================================================
+
+npm init -y
+    Initializes a Node.js project.
+
+npm install express
+    Installs Express.
+
+express.json()
+    Parses JSON request bodies.
+
+express.urlencoded()
+    Parses URL-encoded form data.
+
+EJS
+    Generates dynamic HTML using JavaScript.
+
+app.set("view engine", "ejs")
+    Sets EJS as the template engine.
+
+res.render()
+    Renders an EJS page.
+
+express.static("public")
+    Serves static files.
+
+app.get()
+    Handles GET requests.
+
+app.post()
+    Handles POST requests.
+
+:username
+    Defines a dynamic route parameter.
+
+req.params
+    Gets route parameters.
+
+req.query
+    Gets query string values.
+
+req.body
+    Gets request body data.
+
+res.send()
+    Sends a response.
+
+res.json()
+    Sends JSON data.

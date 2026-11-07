@@ -3,8 +3,16 @@ const express = require('express');
 // Create an Express app
 const app = express();
 
+// express.json() is middleware that parses incoming JSON data
+// from the request body and makes it available in req.body.
+
 app.use(express.json());
-app.use(express.urlencoded({ extended : true}));
+
+// express.urlencoded() is middleware that parses incoming form data
+// (URL-encoded data) and makes it available in req.body.
+// extended: true allows parsing of rich objects and nested data.
+
+app.use(express.urlencoded({ extended: true }));
 
 app.use(function (req , res , next) {
   console.log('middleware chala');
@@ -14,6 +22,11 @@ app.use(function (req , res , next) {
 app.use(function (req , res , next) {
   console.log('middleware chala ak aur baar');
   next();
+  // next() is used to pass control to the next middleware function
+  // or route handler in the Express.js request-response cycle.
+  // Without next(), the request may remain stuck if no response is sent.
+
+next();
 })
 // Create a GET route for the home page
 app.get('/', (req, res) => {
