@@ -1,6 +1,0 @@
-we are making a notes taking web apps 
-
-UI -- input hoga
-      textarea hoga
-      button and cards 
-      folder ke nader save karenge without database
