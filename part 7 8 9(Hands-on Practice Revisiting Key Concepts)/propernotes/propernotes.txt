@@ -1,0 +1,727 @@
+PART 7 — EXPRESS.JS, EJS, FILE SYSTEM AND TASK MANAGER
+
+PURPOSE OF THIS PROJECT
+
+This project is a simple file-based Task Manager.
+
+A user can: 1. Open the homepage and see saved task filenames. 2. Create
+a task with a title and details. 3. Open a task and read its contents.
+4. Open an edit page and rename a task. 5. Return to the homepage after
+an operation.
+
+Each task is stored as a separate .txt file inside the files folder.
+
+IMPORTANT PROJECT STRUCTURE
+
+project/ | |– index.js -> Express server, middleware, routes and file
+operations |– package.json -> Project information and dependency list |–
+package-lock.json -> Records the resolved dependency versions | |–
+files/ -> Stores task .txt files | |– views/ -> EJS templates rendered
+by Express | |– index.ejs -> Homepage and list of tasks | |– show.ejs ->
+Displays one task’s contents | |– edit.ejs -> Form for renaming a task |
+|– public/ -> Public static assets |– css/ |– js/ |– images/
+
+Do not put private files, passwords or secrets inside public/. The
+browser can request files stored in a folder exposed by
+express.static().
+
+1. NODE.JS AND EXPRESS BASICS
+
+Node.js: - A JavaScript runtime that lets JavaScript run outside the
+browser. - It is used here to run the backend server and access the file
+system.
+
+Express.js: - A web framework that runs on Node.js. - It simplifies
+creating servers, routes and middleware.
+
+Install Express: npm install express
+
+Install EJS: npm install ejs
+
+Run the project: node index.js
+
+If nodemon is installed: nodemon index.js
+
+CommonJS import: const express = require(‘express’);
+
+-   require() loads a module.
+-   CommonJS is one module system used by Node.js.
+-   module.exports and require() are commonly used together.
+
+2. MODULES USED IN THE PROJECT
+
+const express = require(‘express’); - Imports Express. - Express
+provides methods such as app.get(), app.post() and app.listen().
+
+const app = express(); - Creates an Express application. - The app
+object is used to configure middleware and routes.
+
+const path = require(‘path’); - Imports Node.js Path module. - Helps
+create and work with file and directory paths. - Useful when building
+paths that work across operating systems.
+
+const fs = require(‘fs’); - Imports Node.js File System module. -
+Provides methods to read, create, rename, delete and manage files.
+
+Do not keep unused imports: - If a module or variable is not used,
+remove it. - For example, const { title } = require('process') is
+unnecessary in this project. - req.body.title comes from the submitted
+form; it does not come from the process module.
+
+3. EXPRESS APPLICATION SETUP
+
+const express = require(‘express’); const app = express(); const path =
+require(‘path’); const fs = require(‘fs’);
+
+app.set(‘view engine’, ‘ejs’);
+
+app.use(express.json()); app.use(express.urlencoded({ extended: true
+}));
+
+app.use(express.static(path.join(__dirname, ‘public’)));
+
+app.listen(3000);
+
+app.set(‘view engine’, ‘ejs’): - Sets EJS as the template engine. -
+Express looks for templates in the views folder by default. -
+res.render('index') renders views/index.ejs.
+
+app.listen(3000): - Starts the Express server on port 3000. - The app
+waits for incoming HTTP requests. - Open http://localhost:3000 in the
+browser. - A port is a communication endpoint used by applications.
+
+4. REQUEST-RESPONSE LIFECYCLE
+
+A typical request follows this sequence:
+
+Browser sends request | v Express receives request | v Registered
+middleware runs in order | v Express finds a matching route | v Route
+handler performs required work | v Server sends a response | v Browser
+displays the result
+
+Important: - A request is sent by the client/browser to the server. - A
+response is sent by the server back to the client. - Middleware can
+inspect or modify the request and response. - A route handler decides
+what to do for a particular method and URL. - A response should be
+completed only once for a request.
+
+5. MIDDLEWARE
+
+Middleware is a function that runs during the request-response cycle.
+
+A middleware function can: - Read or modify req and res. - Execute some
+code. - End the request by sending a response. - Call next() to pass
+control to the next middleware or route.
+
+Basic middleware shape: function myMiddleware(req, res, next) { //
+Perform some work next(); }
+
+next(): - Passes control forward. - If middleware neither sends a
+response nor calls next(), the request may remain pending.
+
+app.use(): - Registers middleware. - Middleware generally runs in the
+order in which it is registered.
+
+Built-in middleware:
+
+A. app.use(express.json()); - Parses incoming JSON request bodies. -
+Makes parsed values available in req.body. - Commonly used when an API
+client sends JSON.
+
+B. app.use(express.urlencoded({ extended: true })); - Parses URL-encoded
+request bodies. - Used for normal HTML form submissions. - Makes
+submitted values available in req.body. - extended: true supports
+richer/nested form data.
+
+C. app.use(express.static(path.join(__dirname, ‘public’))); - Serves
+static files from the public folder. - Example: public/style.css can be
+requested at /style.css. - The public folder name is not automatically
+part of the URL.
+
+Middleware order matters: - Register body-parsing middleware before
+routes that need req.body. - Register middleware in the order in which
+you want it to run.
+
+6. PATH MODULE AND __dirname
+
+__dirname: - Node.js variable containing the absolute directory path of
+the current module. - Helps avoid depending on the terminal’s current
+working directory.
+
+path.join(): - Joins path segments into a valid path for the operating
+system. - Example: path.join(__dirname, ‘public’)
+
+Why use it? - Windows and Linux use different path separators. -
+path.join() handles the separators for the current operating system.
+
+Relative path: ‘./files’
+
+-   Refers to a path relative to the process’s current working
+    directory.
+-   Its meaning can change depending on where the app is started.
+
+Safer project path pattern: const filesPath = path.join(__dirname,
+‘files’);
+
+Use a known base directory when working with project files.
+
+7. REQUEST OBJECT — req
+
+req means request.
+
+It contains information sent by the browser/client.
+
+Important properties:
+
+A. req.params - Reads values from dynamic route parameters. - Example
+route: /file/:filename - Example URL: /file/notes.txt - Read it using
+req.params.filename. - Value: “notes.txt”
+
+B. req.body - Reads submitted request-body data. - Used with POST form
+submissions and parsed JSON. - Requires the appropriate body-parsing
+middleware.
+
+C. req.query - Reads query-string values. - Example URL:
+/search?term=express - Read it using req.query.term. - Value: “express”
+
+Do not confuse them: - req.params = values in dynamic URL path
+segments. - req.body = values submitted in the request body. - req.query
+= values after ? in the URL.
+
+8. RESPONSE OBJECT — res
+
+res means response.
+
+It is used by the server to send information back to the client.
+
+Common methods:
+
+res.send(data) - Sends a response, such as text or HTML.
+
+res.render(view, data) - Renders an EJS template and sends generated
+HTML.
+
+res.redirect(url) - Sends a redirect response. - The browser makes a new
+request to the destination URL.
+
+res.status(code) - Sets the HTTP status code. - Often chained with
+another response method.
+
+Examples: res.status(404).send(‘Page not found’);
+res.status(500).send(‘Server error’);
+
+9. HTTP METHODS
+
+GET: - Commonly used to retrieve or display information. - Example:
+app.get(‘/’, handler). - Should not be used for operations that change
+stored data.
+
+POST: - Commonly used to submit data to the server. - Example:
+app.post(‘/create’, handler). - Used here to create a task and rename a
+task.
+
+Route method and form method must match: - A form with method=“post”
+needs a matching POST route. - A browser request to a GET route does not
+automatically call a POST route.
+
+10. ROUTING
+
+A route connects an HTTP method and URL to a handler function.
+
+Syntax: app.get(‘/path’, function(req, res) { // Handle request });
+
+app.post(‘/path’, function(req, res) { // Handle submitted data });
+
+Routes in this project:
+
+GET / -> Display homepage and task list POST /create -> Create a task
+file GET /file/:filename -> Read and display one task GET
+/edit/:filename -> Display rename form POST /edit -> Rename a task file
+
+Dynamic routing: app.get(‘/file/:filename’, handler);
+
+-   :filename is a route parameter.
+-   The value changes according to the requested URL.
+-   Access it using req.params.filename.
+
+Example: URL: /file/my-task.txt req.params.filename: my-task.txt
+
+11. HTML FORMS
+
+A form sends user-entered data to the server.
+
+Example:
+Create Task
+action: - Specifies the URL to which the form submits data.
+
+method: - Specifies the HTTP method, such as GET or POST.
+
+name: - Defines the key used for the submitted value. - name=“title”
+becomes req.body.title. - name=“details” becomes req.body.details.
+
+type="text": - Creates a single-line text input.
+
+textarea: - Creates a multi-line text input.
+
+type="submit": - Submits the form.
+
+Important: - An input without a name is not submitted as a normal form
+field. - The form’s method must match the Express route. - Body-parsing
+middleware must be registered before the route.
+
+readonly vs disabled: - readonly: user cannot edit the value, but the
+field is submitted. - disabled: user cannot edit the field, and the
+field is not submitted.
+
+12. EJS TEMPLATE ENGINE
+
+EJS means Embedded JavaScript.
+
+-   EJS lets us use JavaScript inside HTML templates.
+-   It is used to display dynamic data from the backend.
+-   EJS templates are stored in the views folder by default.
+-   Express combines the template with the data and sends HTML to the
+    browser.
+
+Setup: app.set(‘view engine’, ‘ejs’);
+
+Render: res.render(‘index’, { files: files });
+
+This renders views/index.ejs and passes the files variable.
+
+EJS TAGS:
+
+A. <% JavaScript %> - Runs JavaScript without directly printing its
+result. - Used for conditions, loops and other control logic.
+
+B. <%= value %> - Evaluates and prints a value. - Escapes HTML
+characters. - Example: <%= filename %> - Prefer this for normal
+user-provided text.
+
+C. <%- value %> - Prints unescaped output. - Can insert HTML markup. -
+Do not use with untrusted user input because it can cause XSS.
+
+D. Comments: <%# This is an EJS comment %> - EJS comment is not included
+in the generated HTML.
+
+13. PASSING DATA TO EJS
+
+Example: res.render(‘show’, { filename: req.params.filename, filedata:
+filedata });
+
+-   The second argument is an object containing template data.
+-   filename and filedata become available inside show.ejs.
+-   They are often called template locals.
+
+Short object property syntax: res.render(‘show’, { filename, filedata
+});
+
+This is equivalent when variable names and object property names are the
+same.
+
+Inside show.ejs:
+<%= filename %>
+<%= filedata %>
+14. EJS CONDITIONALS
+
+Example: <% if (files.length > 0) { %>
+Tasks are available
+<% } else { %>
+No Task Yet
+<% } %>
+
+if: - Checks whether a condition is true.
+
+else: - Runs when the if condition is false.
+
+files.length: - Gives the number of elements in the files array.
+
+Conditional rendering: - Shows different HTML depending on the data. -
+Here it displays task cards when files exist and an empty-state message
+otherwise.
+
+15. EJS LOOPS
+
+Example: <% files.forEach(function(val) { %>
+<%= val %>
+<% }) %>
+
+forEach(): - Array method that runs a callback for each array element.
+
+val: - Represents the current filename in that iteration.
+
+Why use it? - The number of task files can change. - A loop generates
+one task card for each filename.
+
+16. NODE.JS FILE SYSTEM MODULE — fs
+
+The File System module is used to work with files and folders.
+
+Import: const fs = require(‘fs’);
+
+This project uses asynchronous File System methods.
+
+Asynchronous operation: - Starts an operation without blocking the rest
+of the program while it waits. - The callback runs when the operation
+completes. - The server can continue handling other work while the
+operation is pending.
+
+Callback function: - A function passed to another function to be called
+later. - Used here to handle the result of a filesystem operation.
+
+Example: fs.readFile(‘notes.txt’, ‘utf-8’, function(err, data) { //
+Handle result here });
+
+17. CALLBACKS AND ERROR-FIRST CALLBACKS
+
+Callback: - A function passed as an argument to another function. - It
+is executed later by the function receiving it.
+
+Example: function greet(name, callback) { callback(name); }
+
+greet(‘Sam’, function(value) { console.log(value); });
+
+Error-first callback: - A common Node.js callback pattern. - The first
+argument is the error. - The next argument contains the result when
+successful.
+
+Example: function(err, data) { if (err) { return console.log(err); }
+console.log(data); }
+
+Why check err? - A file may not exist. - A folder may not be
+accessible. - Writing or renaming may fail. - Continuing as if the
+operation succeeded can cause incorrect behavior.
+
+18. fs.readdir()
+
+Syntax: fs.readdir(path, callback);
+
+Purpose: - Reads the contents of a directory. - Returns an array of
+names through the callback.
+
+Example: fs.readdir(‘./files’, function(err, files) { if (err) { return
+res.status(500).send(‘Unable to read tasks’); } res.render(‘index’, {
+files: files }); });
+
+In this project: - Reads the files folder. - The returned array is
+passed to index.ejs. - EJS loops over the filenames and creates task
+cards.
+
+19. fs.readFile()
+
+Syntax: fs.readFile(path, encoding, callback);
+
+Purpose: - Reads the contents of a file asynchronously.
+
+Example: fs.readFile(‘./files/task.txt’, ‘utf-8’, function(err,
+filedata) { if (err) { return res.status(404).send(‘Task not found’); }
+res.send(filedata); });
+
+'utf-8': - Decodes file bytes into readable text.
+
+Without an encoding: - Node.js returns a Buffer instead of a normal text
+string.
+
+In this project: - Reads the selected task file. - Passes its content to
+show.ejs.
+
+20. fs.writeFile()
+
+Syntax: fs.writeFile(path, data, callback);
+
+Purpose: - Creates a file if it does not exist. - Replaces the file
+contents if the file already exists.
+
+Example: fs.writeFile(‘./files/task.txt’, ‘Finish Express notes’,
+function(err) { if (err) { return res.status(500).send(‘Unable to save
+task’); } res.redirect(‘/’); });
+
+In this project: - Creates a .txt file using the task title. - Saves the
+task details inside it.
+
+Important: - writeFile() can overwrite an existing file. - Validate the
+title and handle duplicate filenames. - Do not assume writing succeeded
+until the callback reports success.
+
+21. fs.rename()
+
+Syntax: fs.rename(oldPath, newPath, callback);
+
+Purpose: - Renames a file or moves it to another path.
+
+Example: fs.rename(‘./files/old.txt’, ‘./files/new.txt’, function(err) {
+if (err) { return res.status(500).send(‘Unable to rename task’); }
+res.redirect(‘/’); });
+
+In this project: - oldPath comes from req.body.previous. - newPath comes
+from req.body.new. - The file is renamed after the edit form is
+submitted.
+
+22. ERROR HANDLING AND HTTP STATUS CODES
+
+Always handle errors from filesystem callbacks.
+
+Common status codes:
+
+200 OK: - Request succeeded.
+
+302 Found: - Common redirect status used by res.redirect().
+
+400 Bad Request: - Request data is invalid or incomplete.
+
+404 Not Found: - Requested page or file does not exist.
+
+500 Internal Server Error: - Unexpected server-side failure.
+
+Example: if (err) { return res.status(500).send(‘Operation failed’); }
+
+Why use return? - Stops the current callback after sending the error
+response. - Helps prevent a second response from being sent.
+
+Avoid this: if (err) { res.send(‘Error’); } res.send(‘Success’);
+
+The code above may try to send two responses.
+
+23. URL ENCODING
+
+A filename may contain spaces or special characters.
+
+Example: “My Task.txt”
+
+encodeURIComponent(value): - Encodes special characters so a value can
+safely be placed in a URL component.
+
+EJS example: Read More
+
+-   The filename is encoded when generating the link.
+-   Express decodes route parameters when reading req.params.filename.
+
+Use the same approach for the edit link.
+
+24. FILENAME CREATION AND SANITIZATION
+
+A title is user input. Do not use it blindly as a filesystem path.
+
+Example: const safeTitle = req.body.title.trim().split(/+/).join(‘-’);
+const filename = safeTitle + ‘.txt’;
+
+trim(): - Removes whitespace from the beginning and end.
+
+split(/\s+/): - Splits text wherever one or more whitespace characters
+occur.
+
+join('-'): - Joins the pieces using hyphens.
+
+Example: “My First Task” -> “My-First-Task.txt”
+
+Important correction: split(' ').join(' ') does not change spaces. Use
+split(' ').join('-') or the whitespace-safe expression above.
+
+Validation should also: - Reject an empty title. - Restrict characters
+that are not allowed in filenames. - Handle duplicate filenames. -
+Prevent path traversal attempts such as ../../secret.txt. - Keep all
+task paths inside the intended files directory.
+
+25. PATH SAFETY
+
+Never trust a filename supplied by the browser.
+
+Risk: - A user may try to send a filename containing ../. - If used
+carelessly, this can point outside the files directory.
+
+Safer approach: - Resolve the requested filename against a fixed files
+directory. - Check that the final resolved path remains inside that
+directory. - Reject invalid names before reading, writing or renaming.
+
+path.resolve(): - Produces an absolute normalized path.
+
+path.join(): - Joins path segments.
+
+path.basename(): - Returns the final part of a path. - It can help with
+validation, but it is not a complete security solution by itself.
+
+26. REDIRECT VS RENDER
+
+res.render('index', { files }): - Renders an EJS template on the
+server. - Sends generated HTML as the response. - Does not navigate the
+browser to a new URL.
+
+res.redirect('/'): - Sends a redirect response. - Browser makes a new
+request to the homepage. - Useful after a successful create or rename
+operation.
+
+27. STATIC FILES AND PUBLIC FOLDER
+
+Middleware: app.use(express.static(path.join(__dirname, ‘public’)));
+
+Purpose: - Serves CSS, client-side JavaScript, images and other public
+assets. - The browser can request these files directly.
+
+Example: Project file: public/css/style.css Browser URL: /css/style.css
+
+Static files are different from EJS: - EJS is rendered by the server. -
+Static files are sent as they are stored.
+
+28. TAILWIND CSS USED IN THE PROJECT
+
+Tailwind CSS: - Utility-first CSS framework. - Styles are applied using
+classes directly in HTML.
+
+CDN:
+Common classes:
+
+Layout: w-full -> width: 100% min-h-screen -> minimum height: viewport
+height block -> display: block flex -> enables Flexbox flex-wrap ->
+allows items to wrap gap-3 -> gap between items justify-between -> space
+between items items-center -> align items at center
+
+Spacing: p-10 -> padding on all sides px-5 -> horizontal padding py-2 ->
+vertical padding mt-2 -> top margin mb-10 -> bottom margin
+
+Colors: bg-zinc-900 -> dark background bg-zinc-800 -> slightly lighter
+dark background bg-blue-600 -> blue background text-white -> white text
+text-blue-500 -> blue text text-zinc-600 -> zinc-colored text
+
+Text: text-xl -> extra-large text text-3xl -> larger text text-4xl ->
+extra-large heading font-light -> light font weight tracking-tighter ->
+tighter letter spacing
+
+Other: rounded-md -> medium rounded corners min-w-72 -> minimum width
+resize-none -> disables textarea resizing inline-block -> inline element
+with block layout behavior
+
+29. COMPLETE PROJECT ROUTE FLOW
+
+A. HOMEPAGE — GET / Browser requests / -> Express runs middleware -> GET
+/ route runs -> fs.readdir() reads files folder -> res.render(‘index’, {
+files }) -> index.ejs loops over filenames -> Browser displays task
+cards
+
+B. CREATE TASK — POST /create User fills title and details -> HTML form
+submits POST /create -> express.urlencoded() parses form values ->
+req.body.title and req.body.details are read -> fs.writeFile() creates
+the task file -> res.redirect(‘/’) -> Browser requests homepage again
+
+C. READ TASK — GET /file/:filename User clicks Read More -> Browser
+requests /file/task.txt -> Express reads req.params.filename ->
+fs.readFile() reads the file -> res.render(‘show’, { filename, filedata
+}) -> show.ejs displays the task
+
+D. OPEN EDIT PAGE — GET /edit/:filename User clicks edit filename ->
+Browser requests /edit/task.txt -> Express reads req.params.filename ->
+res.render(‘edit’, { filename }) -> edit.ejs displays the rename form
+
+E. RENAME TASK — POST /edit User submits old and new filenames -> Form
+submits POST /edit -> express.urlencoded() parses values ->
+req.body.previous and req.body.new are read -> fs.rename() renames the
+file -> res.redirect(‘/’) -> Browser requests homepage again
+
+30. COMMON BEGINNER MISTAKES
+
+1.  Cannot GET /:
+
+-   No matching GET route exists for the requested URL.
+-   Check the URL and route method.
+
+2.  Cannot find module ‘ejs’:
+
+-   EJS is not installed in the current project.
+-   Run npm install ejs inside the correct project folder.
+
+3.  req.body is undefined:
+
+-   Check that express.urlencoded() or express.json() is registered.
+-   Check that middleware is registered before the route.
+-   Check the form method and input name attributes.
+
+4.  EJS variable is not defined:
+
+-   Check the object passed to res.render().
+-   Check the variable name used in the EJS file.
+
+5.  File not found:
+
+-   Check the filename and files directory.
+-   Check whether the file exists.
+-   Handle the fs error.
+
+6.  Form data is missing:
+
+-   Check each input’s name attribute.
+-   Check the form action and method.
+-   Remember disabled fields are not submitted.
+
+7.  Static CSS is not loading:
+
+-   Check the public folder location.
+-   Check express.static() path.
+-   Check the browser URL.
+
+8.  File is unexpectedly overwritten:
+
+-   fs.writeFile() replaces an existing file’s contents.
+-   Check for duplicate filenames before writing.
+
+31. IMPROVED PROJECT CODE PATTERNS
+
+Use these patterns when improving the original project.
+
+A. Define a fixed files directory: const filesPath =
+path.join(__dirname, ‘files’);
+
+B. Check errors in a directory read: fs.readdir(filesPath, function(err,
+files) { if (err) { return res.status(500).send(‘Unable to read task
+folder’); } res.render(‘index’, { files }); });
+
+C. Check errors when reading a task: fs.readFile(filePath, ‘utf-8’,
+function(err, filedata) { if (err) { return res.status(404).send(‘Task
+not found’); } res.render(‘show’, { filename, filedata }); });
+
+D. Check errors when creating a task: fs.writeFile(filePath, details,
+function(err) { if (err) { return res.status(500).send(‘Unable to create
+task’); } res.redirect(‘/’); });
+
+E. Check errors when renaming: fs.rename(oldPath, newPath, function(err)
+{ if (err) { return res.status(500).send(‘Unable to rename task’); }
+res.redirect(‘/’); });
+
+These are patterns, not a complete production-ready security
+implementation. Validate and safely resolve all user-controlled
+filenames before using them.
+
+32. QUICK REVISION — IMPORTANT DIFFERENCES
+
+Node.js = Runs JavaScript outside the browser Express.js = Framework for
+creating web servers and routes EJS = Template engine for dynamic HTML
+fs = File System module path = Module for handling file paths __dirname
+= Current module’s directory path path.join() = Joins path segments
+app.use() = Registers middleware app.get() = Handles GET requests
+app.post() = Handles POST requests req.params = Reads dynamic URL
+parameters req.body = Reads submitted body data req.query = Reads
+query-string data res.send() = Sends a response res.render() = Renders
+an EJS template res.redirect() = Redirects the browser fs.readdir() =
+Reads directory contents fs.readFile() = Reads file content
+fs.writeFile() = Creates or overwrites a file fs.rename() = Renames or
+moves a file callback = Function executed later by another function
+next() = Passes control to the next middleware encodeURIComponent() =
+Encodes a URL component trim() = Removes leading and trailing whitespace
+forEach() = Iterates over array elements
+
+EJS: <% %> = Executes JavaScript without printing its result <%= %> =
+Prints escaped output <%- %> = Prints unescaped output <%# %> = EJS
+comment
+
+FINAL UNDERSTANDING
+
+The browser sends an HTTP request. Express receives the request and runs
+middleware. A matching route handles the request. The route uses
+req.params or req.body to get data. The File System module reads or
+changes task files. Express passes data to an EJS template using
+res.render(). EJS generates HTML. The server sends the HTML response to
+the browser.
+
+This project combines: - Node.js - Express.js - Routing - Middleware -
+HTML forms - EJS templating - Dynamic data rendering - Callbacks -
+Asynchronous file operations - File and folder handling - URL
+parameters - Form-body parsing - Static assets - Basic validation and
+error handling - Tailwind CSS
