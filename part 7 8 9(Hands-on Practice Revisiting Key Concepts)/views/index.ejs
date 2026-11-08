@@ -1,35 +1,67 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8"> <!-- Character Encoding: Supports standard text characters -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Responsive Design: Adjusts layout to screen size -->
     <title>Document</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com"></script> <!-- CDN: Loads Tailwind CSS without local installation -->
 </head>
 
 <body>
-    <div class="main w-full min-h-screen bg-zinc-900">
-        <div class="form p-10 text-white">
-            <form action="/create" method="post">
-                <input class="block w-full rounded-md px-5 py-2 bg-zinc-800" type="text" placeholder="Title goes here" name="title">
-                <textarea class="block w-full rounded-md  mt-2 px-5 py-2 resize-none bg-zinc-800" placeholder="Write your task details here" name="details"></textarea>
-                <input class="mt-2 bg-blue-600 px-5 px-2 rounded-md" type="submit" value="Create Task">
+    <div class="main w-full min-h-screen bg-zinc-900"> <!-- Container: Main wrapper with full width and minimum screen height -->
+
+        <div class="form p-10 text-white"> <!-- Spacing & Typography: Adds padding and white text -->
+
+            <form action="/create" method="post"> <!-- Form Handling: Sends submitted data to POST /create route -->
+
+                <input class="block w-full rounded-md px-5 py-2 bg-zinc-800"
+                    type="text" placeholder="Title goes here" name="title"> <!-- Form Input: Takes task title; name identifies data in req.body -->
+
+                <textarea class="block w-full rounded-md mt-2 px-5 py-2 resize-none bg-zinc-800"
+                    placeholder="Write your task details here" name="details"></textarea> <!-- Textarea: Accepts multiline task details -->
+
+                <input class="mt-2 bg-blue-600 px-5 py-2 rounded-md"
+                    type="submit" value="Create Task"> <!-- Form Submission: Sends title and details to Express -->
+
             </form>
         </div>
-        <div class="tasks flex gap-3 flex-wrap p-10">
-            <% if (files.length> 0) { %>
-                <% files.forEach(function(val) { %>
-                    <div class="task min-w-72 px-3 py-4 rounded-md bg-zinc-800">
-                        <h1 class="text-white text-3xl tracking-tighter"><%= val%></h1>
-                        <a class="text-blue-500 inline-block mt-3" href="/file/<%= val%>">Read More.</a>
-                    </div>
-                    <% }) %>
-                        <% } else { %>
-                            <h3 class="text-zinc-600">No Task Yet....</h3>
-                            <% } %>
-        </div>
 
+        <div class="tasks flex gap-3 flex-wrap p-10"> <!-- Flexbox: Arranges task cards with spacing and wrapping -->
+
+            <% if (files.length > 0) { %> <!-- Conditional Rendering: Checks whether the files array contains files -->
+
+                <% files.forEach(function(val) { %> <!-- Looping: forEach visits every filename; val stores current filename -->
+
+                    <div class="task min-w-72 px-3 py-4 rounded-md bg-zinc-800"> <!-- Card Layout: Creates individual task container -->
+
+                        <h1 class="text-white text-3xl tracking-tighter">
+                            <%= val %> <!-- EJS Output: Displays the current filename as HTML text -->
+                        </h1>
+
+                        <div class="flex w-full justify-between items-center mt-3"> <!-- Flexbox Alignment: Places links at opposite ends -->
+
+                            <a class="text-blue-500 inline-block" href="/file/<%= encodeURIComponent(val) %>">
+                                Read More
+                            </a> <!-- Dynamic Routing: Opens selected file; encodeURIComponent handles spaces and special characters -->
+
+                            <a class="text-zinc-600" href="/edit/<%= encodeURIComponent(val) %>">
+                                edit filename
+                            </a> <!-- Dynamic Routing: Opens edit page for the selected filename -->
+
+                        </div>
+                    </div>
+
+                <% }) %> <!-- Loop Termination: Ends the forEach iteration -->
+
+            <% } else { %> <!-- Else Condition: Runs when files.length is zero -->
+
+                <h3 class="text-zinc-600">No Task Yet....</h3> <!-- Empty State: Displays message when no tasks exist -->
+
+            <% } %> <!-- Conditional Termination: Ends the if-else block -->
+
+        </div>
     </div>
 </body>
 

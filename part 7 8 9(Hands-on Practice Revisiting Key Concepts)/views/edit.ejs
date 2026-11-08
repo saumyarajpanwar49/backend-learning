@@ -1,0 +1,29 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8"> <!-- Defines character encoding -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Responsive layout -->
+    <title>Document</title>
+    <script src="https://cdn.tailwindcss.com"></script> <!-- Tailwind CSS CDN -->
+</head>
+
+<body>
+    <div class="main w-full min-h-screen bg-zinc-900 p-10 text-white">
+
+        <a class="text-blue-500 inline-block mb-10" href="/">Go back to home</a> <!-- Navigates to home route -->
+
+        <form action="/edit" method="post"> <!-- Sends form data to POST /edit route -->
+
+            <input class="block w-1/4 rounded-md px-5 py-2 bg-zinc-800" type="text" placeholder="previous name" name="previous" value="<%= filename %>"> <!-- Displays previous filename using EJS -->
+
+            <input class="block w-1/4 rounded-md px-5 py-2 text-zinc-600 bg-zinc-800 mt-2" type="text" placeholder="new name" name="new"> <!-- Takes new filename from user -->
+
+            <input class="mt-2 bg-yellow-600 px-5 py-2 rounded-md" type="submit" value="Update Name"> <!-- Submits form data -->
+
+        </form>
+    </div>
+</body>
+
+</html>

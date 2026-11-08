@@ -1,18 +1,27 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8"> <!-- Character Encoding: Defines text encoding to support different characters -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Responsive Design: Makes webpage adapt to mobile, tablet and desktop -->
     <title>Document</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com"></script> <!-- CDN: Loads Tailwind CSS directly without installing it -->
 </head>
 
 <body>
-    <div class="main w-full min-h-screen bg-zinc-900 p-10 text-white">
-        <a class = "text-blue-500 inline-block mb-10" href=""> Go back to home</a>
-        <h1 class = "text-4xl tracking-tighter"><%= filename %></h1>
-        <p class="text-xl mt-5 font-light"><%= filedata %></p>
+    <div class="main w-full min-h-screen bg-zinc-900 p-10 text-white"> <!-- Container: Main wrapper; w-full = full width, min-h-screen = minimum viewport height, p-10 = padding -->
+
+        <a class="text-blue-500 inline-block mb-10" href="/">Go back to home</a> <!-- Navigation: href="/" sends user to the Express home route -->
+
+        <h1 class="text-4xl tracking-tighter">
+            <%= filename %> <!-- EJS Output: Displays dynamic filename passed from Express using res.render() -->
+        </h1>
+
+        <p class="text-xl mt-5 font-light">
+            <%= filedata %> <!-- Dynamic Rendering: Displays file content received from fs.readFile() -->
+        </p>
+
     </div>
 </body>
 
