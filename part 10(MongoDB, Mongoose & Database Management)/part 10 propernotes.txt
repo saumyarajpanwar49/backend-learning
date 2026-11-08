@@ -1,0 +1,375 @@
+# DATABASE & DATA STORAGE (MONGODB)
+
+## 1. WHAT IS DATA STORAGE?
+
+Data Storage means storing data permanently so that it can be accessed, managed, updated and deleted whenever required.
+
+Example:
+- User name
+- Email
+- Password (stored in hashed form)
+- Phone number
+- Profile information
+
+A simple file like `file-data.txt` can store data, but it is not suitable for managing thousands or millions of users.
+
+For large applications, we use DATABASES.
+
+## 2. WHAT IS A DATABASE?
+
+A Database is an organized collection of data that allows us to store, retrieve, update and delete information efficiently.
+
+Example:
+An application may store:
+- Users
+- Products
+- Orders
+- Payments
+
+## 3. TYPES OF DATABASES
+
+There are two major database categories:
+
+### A. SQL (Relational Database)
+
+- Stores data in TABLES (rows and columns).
+- Has a predefined structure.
+- Tables can be related using keys.
+- Generally uses SQL (Structured Query Language).
+
+Examples:
+- MySQL
+- PostgreSQL
+- SQLite
+- Microsoft SQL Server
+
+Example:
+
+USERS TABLE
+
+| ID | NAME | EMAIL |
+|----|------|-------|
+| 1 | Rahul | rahul@gmail.com |
+| 2 | Aman | aman@gmail.com |
+
+### B. NoSQL (Non-Relational Database)
+
+- Stores data using different structures.
+- Commonly stores data in document format (JSON-like).
+- Flexible structure.
+- Useful for applications with varying or evolving data structures.
+
+Examples:
+- MongoDB
+- Firebase Firestore
+- Cassandra
+- Redis
+
+Example (MongoDB Document):
+
+{
+  name: "Rahul",
+  email: "rahul@gmail.com",
+  age: 21
+}
+
+IMPORTANT:
+SQL = Tables (Relational)
+NoSQL = Multiple data models, including Documents, Key-Value, Graph and Wide-Column.
+
+We are going to learn MONGODB (Document-oriented NoSQL Database).
+
+## 4. WHAT IS MONGODB?
+
+MongoDB is a NoSQL, document-oriented database.
+
+It stores data in BSON (Binary JSON) format.
+
+Features:
+- Stores data in documents.
+- Flexible schema.
+- Supports nested objects and arrays.
+- Allows CRUD operations.
+- Can handle large amounts of data.
+- Supports indexing and aggregation.
+
+WHY MONGODB?
+
+1. Flexible data structure.
+2. Easy to work with JavaScript objects.
+3. Suitable for Node.js and Express.js applications.
+4. Supports horizontal scaling.
+5. Handles complex and nested data efficiently.
+
+## 5. IMPORTANT DATABASE TERMINOLOGIES
+
+### A. DATABASE
+The main container that stores collections.
+
+Example: `schoolDB`
+
+### B. COLLECTION
+A collection is a group of related documents.
+
+Example: `users`, `products`, `orders`
+
+SQL comparison: Collection ≈ Table.
+
+### C. DOCUMENT
+A document is an individual record inside a collection.
+
+Example:
+
+{
+  name: "Rahul",
+  age: 21,
+  email: "rahul@gmail.com"
+}
+
+SQL comparison: Document ≈ Row.
+
+### D. KEY
+A key is the name of a field inside a document.
+
+Example:
+
+{
+  name: "Rahul",
+  age: 21
+}
+
+Here, `name` and `age` are keys.
+
+### E. VALUE
+The actual data associated with a key.
+
+Example:
+- name = "Rahul"
+- age = 21
+
+### F. SCHEMA
+A schema defines the expected structure of documents.
+
+It specifies:
+- Field names
+- Data types
+- Required fields
+- Default values
+- Validation rules
+
+Example:
+name must be String.
+age must be Number.
+
+MongoDB itself allows flexible schemas. Mongoose schemas provide structure and validation at the application level.
+
+### G. MODEL
+A model is created using a Mongoose schema.
+
+It provides an interface to interact with a MongoDB collection.
+
+Using a model, we can:
+- Create documents.
+- Find documents.
+- Update documents.
+- Delete documents.
+
+## 6. DATABASE HIERARCHY
+
+DATABASE
+   |
+   |---- COLLECTIONS
+             |
+             |---- DOCUMENTS
+                        |
+                        |---- KEY : VALUE
+
+Example:
+
+schoolDB
+   |
+   |---- users
+   |       |
+   |       |---- { name: "Rahul", age: 21 }
+   |       |---- { name: "Aman", age: 22 }
+   |
+   |---- products
+           |
+           |---- { name: "Laptop", price: 50000 }
+
+## 7. BACKEND ARCHITECTURE
+
+A typical backend application communicates with two major server-side components:
+
+### A. APPLICATION SERVER
+
+The Application Server runs backend application code.
+
+Example: Node.js + Express.js
+
+Responsibilities:
+- Accept HTTP requests.
+- Process business logic.
+- Handle login and logout.
+- Validate user input.
+- Apply authentication and authorization.
+- Communicate with the database.
+- Send HTTP responses.
+
+IMPORTANT:
+The Application Server does NOT usually store persistent application data itself. It communicates with the Database Server for data operations.
+
+### B. DATABASE SERVER
+
+The Database Server manages persistent data.
+
+Responsibilities:
+- Store user information.
+- Retrieve data.
+- Update data.
+- Delete data.
+- Manage collections and documents.
+- Handle database queries.
+
+Example: MongoDB Server.
+
+### REQUEST FLOW
+
+CLIENT (Browser)
+       |
+       | HTTP Request
+       v
+APPLICATION SERVER (Node.js + Express)
+       |
+       | Database Query
+       v
+DATABASE SERVER (MongoDB)
+       |
+       | Data Response
+       v
+APPLICATION SERVER
+       |
+       | HTTP Response
+       v
+CLIENT (Browser)
+
+Example: User Login
+
+1. User enters email and password.
+2. Browser sends login request.
+3. Application Server receives the request.
+4. Backend validates the input.
+5. Backend fetches the user from MongoDB.
+6. Backend compares the password with its stored hash.
+7. Backend sends the login response.
+
+## 8. MONGODB + MONGOOSE MAPPING
+
+Mongoose is an ODM (Object Data Modeling) library for Node.js and MongoDB.
+
+It makes it easier to define schemas and interact with MongoDB.
+
+| MONGOOSE CODE            |              MONGODB CONCEPT                     |
+|--------------------------|--------------------------------------------------|
+| mongoose.connect()       | Connects to a database                           |
+| mongoose.Schema()        | Defines document structure                       |
+| mongoose.model()         | Creates/gets a model and maps it to a collection |
+| User.create()            | Creates a document                               |
+| User.find()              | Retrieves documents                              |
+| User.findById()          | Retrieves a document by ID                       |
+| User.findByIdAndUpdate() | Updates a document                               |
+| User.findByIdAndDelete() | Deletes a document                               |
+
+IMPORTANT CORRECTIONS:
+
+1. `mongoose.connect()` connects to a MongoDB database. MongoDB creates the database physically when data is first stored (or when a collection is explicitly created).
+
+2. `mongoose.model()` creates a Mongoose model and maps it to a MongoDB collection. The collection is generally created when data is first inserted.
+
+3. `User.create()` inserts a new document into the collection.
+
+## 9. BASIC MONGOOSE CODE
+
+const mongoose = require("mongoose");
+
+// 1. Connect to MongoDB
+mongoose.connect("mongodb://127.0.0.1:27017/schoolDB");
+
+// 2. Define Schema
+const userSchema = new mongoose.Schema({
+    name: String,
+    email: String,
+    age: Number
+});
+
+// 3. Create Model
+const User = mongoose.model("User", userSchema);
+
+// 4. Create Document
+async function createUser() {
+    const user = await User.create({
+        name: "Rahul",
+        email: "rahul@gmail.com",
+        age: 21
+    });
+
+    console.log(user);
+}
+
+createUser();
+
+## 10. IMPORTANT DIFFERENCE
+
+MONGODB:
+- Database
+- Collection
+- Document
+- Field (Key-Value)
+
+MONGOOSE:
+- Connection
+- Schema
+- Model
+- CRUD Methods
+
+REMEMBER:
+
+Database → Collection → Document → Fields
+
+Mongoose Schema → Mongoose Model → Database Operations
+
+Mongoose is an ODM, NOT a database.
+
+MongoDB is the actual database.
+
+## 11. QUICK REVISION
+
+Q1. What is a database?
+A structured place to store and manage data.
+
+Q2. What is SQL?
+A relational database approach that stores data in tables.
+
+Q3. What is NoSQL?
+A non-relational database category supporting different data models.
+
+Q4. What is MongoDB?
+A document-oriented NoSQL database.
+
+Q5. What is a collection?
+A group of related documents.
+
+Q6. What is a document?
+An individual record stored in a collection.
+
+Q7. What is a schema?
+A definition of the expected structure and validation rules.
+
+Q8. What is a model?
+A Mongoose interface used to interact with a MongoDB collection.
+
+Q9. What is Mongoose?
+An ODM library that connects Node.js applications with MongoDB.
+
+Q10. What does CRUD mean?
+Create, Read, Update, Delete.

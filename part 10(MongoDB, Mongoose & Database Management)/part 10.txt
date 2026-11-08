@@ -1,0 +1,19 @@
+data Storage:
+     aisa kuchh jaha par hum saare users ki info store kar sakte hai
+     file-data.txt  --- database
+Types of DATABASES - SQL | NoSQL
+    SQL - data ko ek roop mein rakhna - tables 
+    NoSQL - objects way me data hota hai
+    padne wale hai MongoDB -- NoSQL
+what and Why 
+    
+terminologies - collections , documents , schemas , keys , models 
+     database -> collections -> documents ----- database level pe
+
+backend me do server hote hai application server (jo request ko accept karte hai AS ka kya kaam hai sab kuchh((login karna , logout karna)) karna bus data ka kaam nhhi karna) and database server 
+
+CODE                 DATABASE
+----------------------------------------
+mongoose.connect ->  database create
+model create     ->  collection create
+create user      ->  document create
