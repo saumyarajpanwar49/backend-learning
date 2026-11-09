@@ -1,0 +1,786 @@
+# MONGODB AND MONGOOSE — COMPLETE NOTES
+
+## 1. WHAT IS MONGODB?
+
+MongoDB is a NoSQL, document-oriented database used to store data in flexible, JSON-like documents.
+
+Unlike relational databases (MySQL), MongoDB stores data in collections and documents.
+
+### MongoDB terminology
+
+- Database: Container that stores collections.
+- Collection: Group of related documents (similar to a table).
+- Document: Individual record (similar to a row).
+- Field: Key-value pair inside a document.
+- _id: Unique identifier automatically generated for every document.
+- BSON: Binary JSON format used internally by MongoDB.
+
+### Example document
+
+{
+    "_id": "12345",
+    "name": "Saumyaraj",
+    "age": 18,
+    "email": "example@gmail.com"
+}
+
+### SQL vs MongoDB
+
+SQL                  MongoDB
+Database             Database
+Table                Collection
+Row                  Document
+Column               Field
+Primary Key          _id
+
+---
+
+## 2. MONGODB INSTALLATION
+
+MongoDB has three important tools:
+
+1. MongoDB Community Server:
+   Actual database server that stores data.
+
+2. MongoDB Compass:
+   GUI application to visually manage databases, collections and documents.
+
+3. MongoDB Shell (mongosh):
+   Command-line tool to interact with MongoDB.
+
+### Installation steps (Windows)
+
+1. Download MongoDB Community Server:
+   https://www.mongodb.com/try/download/community
+
+2. Select Windows and MSI package.
+
+3. Run installer and select Complete installation.
+
+4. Enable Install MongoDB as a Service.
+
+5. Install MongoDB Compass if required.
+
+6. Install MongoDB Shell (mongosh) if it is not already installed.
+
+### Check installation
+
+Open CMD or PowerShell:
+
+mongod --version
+
+mongosh --version
+
+If commands are not recognized, check your MongoDB installation and PATH configuration.
+
+### Connect using MongoDB Shell
+
+mongosh
+
+### Basic MongoDB commands
+
+show dbs
+use mydatabase
+db
+show collections
+
+Create a collection:
+
+db.createCollection("users")
+
+Insert document:
+
+db.users.insertOne({
+    name: "Saumyaraj",
+    age: 18
+})
+
+Read documents:
+
+db.users.find()
+
+Find one document:
+
+db.users.findOne({ name: "Saumyaraj" })
+
+Update document:
+
+db.users.updateOne(
+    { name: "Saumyaraj" },
+    { $set: { age: 19 } }
+)
+
+Delete document:
+
+db.users.deleteOne({ name: "Saumyaraj" })
+
+---
+
+## 3. WHAT IS MONGOOSE?
+
+Mongoose is an ODM library for MongoDB and Node.js.
+
+It provides:
+- Schema definition.
+- Model creation.
+- Data validation.
+- CRUD operations.
+- Middleware/hooks.
+- Relationships using references.
+- Query building.
+
+Install Mongoose:
+
+npm install mongoose
+
+---
+
+## 4. ODM AND ORM
+
+### ODM (Object Document Mapper)
+
+ODM connects object-oriented programming with document-oriented databases.
+
+It maps application objects to database documents.
+
+Example:
+Mongoose is an ODM for MongoDB.
+
+### ORM (Object Relational Mapper)
+
+ORM connects object-oriented programming with relational databases.
+
+It maps application objects to relational database tables and rows.
+
+Examples:
+- Sequelize
+- Prisma (ORM supporting relational databases)
+- TypeORM
+- Hibernate (Java)
+
+### ODM vs ORM
+
+ODM:
+- Works with document databases.
+- Uses documents and collections.
+- Example: Mongoose + MongoDB.
+
+ORM:
+- Works with relational databases.
+- Uses tables and rows.
+- Example: Sequelize + MySQL.
+
+Remember:
+ODM = Object Document Mapping
+ORM = Object Relational Mapping
+
+---
+
+## 5. MONGODB CONNECTION USING MONGOOSE
+
+First create a Node.js project:
+
+mkdir mongodb-project
+cd mongodb-project
+
+npm init -y
+
+Install dependencies:
+
+npm install express mongoose
+
+### Basic project structure
+
+mongodb-project/
+|
+|-- app.js
+|-- usermodel.js
+|-- package.json
+
+### Connection code (app.js)
+
+const express = require('express');
+const mongoose = require('mongoose');
+
+const app = express();
+
+mongoose.connect('mongodb://127.0.0.1:27017/mydatabase')
+.then(() => {
+    console.log("MongoDB Connected");
+})
+.catch((err) => {
+    console.log(err);
+});
+
+app.listen(3000, () => {
+    console.log("Server running");
+});
+
+### MongoDB connection URI
+
+mongodb://127.0.0.1:27017/mydatabase
+
+mongodb:// = MongoDB protocol
+127.0.0.1 = Local machine
+27017 = Default MongoDB port
+mydatabase = Database name
+
+MongoDB creates the database when data is first written to it.
+
+Important:
+- mongoose.connect() is asynchronous.
+- Use await or .then() to handle connection.
+- Make sure MongoDB Server is running.
+- Do not expose database passwords in public code.
+- Use environment variables for production credentials.
+
+---
+
+## 6. WHAT IS A SCHEMA?
+
+A Schema defines the structure of documents in a MongoDB collection when using Mongoose.
+
+It defines:
+- Field names.
+- Data types.
+- Default values.
+- Required fields.
+- Validation rules.
+- Other field options.
+
+### Example
+
+const mongoose = require('mongoose');
+
+const userSchema = mongoose.Schema({
+    name: String,
+    username: String,
+    email: String,
+    age: Number
+});
+
+### Common Mongoose data types
+
+String
+Number
+Boolean
+Date
+Buffer
+ObjectId
+Array
+Mixed
+Map
+Decimal128
+
+### Schema validation
+
+const userSchema = mongoose.Schema({
+
+    name: {
+        type: String,
+        required: true
+    },
+
+    email: {
+        type: String,
+        required: true
+    },
+
+    age: {
+        type: Number,
+        min: 1,
+        max: 100
+    },
+
+    username: {
+        type: String,
+        unique: true
+    },
+
+    role: {
+        type: String,
+        default: "user"
+    }
+
+});
+
+### Important Schema options
+
+required: Field must be provided.
+
+default: Sets a default value.
+
+unique: Creates a unique index; not a Mongoose validator.
+
+min / max: Number validation.
+
+minlength / maxlength: String length validation.
+
+enum: Restricts values to specified options.
+
+trim: Removes extra whitespace from strings.
+
+lowercase: Converts strings to lowercase.
+
+timestamps: Automatically creates createdAt and updatedAt.
+
+---
+
+## 7. WHAT IS A MODEL?
+
+A Model is a JavaScript class created from a Mongoose Schema.
+
+It provides an interface to interact with the MongoDB collection.
+
+Using a model, we can:
+- Create documents.
+- Read documents.
+- Update documents.
+- Delete documents.
+
+### Creating a Model
+
+const mongoose = require('mongoose');
+
+const userSchema = mongoose.Schema({
+
+    name: String,
+    username: String,
+    email: String
+
+});
+
+const userModel = mongoose.model("user", userSchema);
+
+module.exports = userModel;
+
+### Important
+
+mongoose.model("user", userSchema)
+
+First argument = Model name.
+
+Second argument = Schema.
+
+Mongoose normally converts the model name into a plural, lowercase collection name.
+
+Example:
+user → users
+
+Model = Interface
+Schema = Structure and rules
+
+---
+
+## 8. CRUD OPERATIONS
+
+CRUD represents four basic database operations.
+
+C = Create
+R = Read
+U = Update
+D = Delete
+
+Assume the following files:
+
+app.js
+usermodel.js
+
+### A. CREATE
+
+Create operation inserts new documents into MongoDB.
+
+Syntax:
+
+userModel.create({ data })
+
+Example:
+
+app.get('/create', async (req, res) => {
+
+    let createduser = await userModel.create({
+
+        name: "Saumyaraj Singh Panwar",
+        email: "saumyarajpanwar@gmail.com",
+        username: "saumyaraj"
+
+    });
+
+    res.send(createduser);
+
+});
+
+Important:
+- create() is asynchronous.
+- It returns the created document.
+- It performs schema validation.
+- Duplicate values are rejected if a unique index exists.
+
+### B. READ
+
+Read operation retrieves documents from MongoDB.
+
+1. find()
+
+userModel.find()
+
+Returns all matching documents in an array.
+
+userModel.find({ username: "saumyaraj" })
+
+Returns all documents matching the condition.
+
+2. findOne()
+
+userModel.findOne({ username: "saumyaraj" })
+
+Returns the first matching document as an object, or null.
+
+3. findById()
+
+userModel.findById("DOCUMENT_ID")
+
+Finds a document using its _id.
+
+4. find with multiple conditions
+
+userModel.find({
+    age: 18,
+    username: "saumyaraj"
+})
+
+5. Find all documents
+
+userModel.find({})
+
+6. Find only one result using find()
+
+userModel.find({ username: "saumyaraj" })
+
+IMPORTANT:
+find() returns ALL matching documents.
+It does not automatically return one document.
+Without limit(), use a condition that matches only one document if you need one result.
+
+### C. UPDATE
+
+Update operation modifies existing documents.
+
+1. updateOne()
+
+userModel.updateOne(
+    { username: "saumyaraj" },
+    { $set: { name: "Shouryaraj" } }
+)
+
+Updates the first matching document.
+
+Returns update information, not the updated document.
+
+2. updateMany()
+
+userModel.updateMany(
+    { username: "saumyaraj" },
+    { $set: { name: "Shouryaraj" } }
+)
+
+Updates all matching documents.
+
+3. findOneAndUpdate()
+
+userModel.findOneAndUpdate(
+    { username: "saumyaraj" },
+    { name: "Shouryaraj" },
+    { new: true }
+)
+
+Finds one document and updates it.
+
+new: true = Returns the updated document.
+
+new: false = Returns the document before updating (default behavior).
+
+4. findByIdAndUpdate()
+
+userModel.findByIdAndUpdate(
+    "DOCUMENT_ID",
+    { name: "Shouryaraj" },
+    { new: true }
+)
+
+Updates a document using its _id.
+
+Important:
+- $set updates specified fields.
+- Fields not mentioned remain unchanged.
+- findOneAndUpdate() does not run update validators by default.
+- Use { runValidators: true } when required.
+
+Example:
+
+userModel.findOneAndUpdate(
+    { username: "saumyaraj" },
+    { age: 19 },
+    {
+        new: true,
+        runValidators: true
+    }
+)
+
+### D. DELETE
+
+Delete operation removes documents from MongoDB.
+
+1. deleteOne()
+
+userModel.deleteOne({
+    username: "saumyaraj"
+})
+
+Deletes the first matching document.
+
+2. deleteMany()
+
+userModel.deleteMany({
+    username: "saumyaraj"
+})
+
+Deletes all matching documents.
+
+3. findOneAndDelete()
+
+userModel.findOneAndDelete({
+    username: "saumyaraj"
+})
+
+Finds and deletes one document.
+
+Returns the deleted document.
+
+4. findByIdAndDelete()
+
+userModel.findByIdAndDelete("DOCUMENT_ID")
+
+Deletes a document using its _id.
+
+---
+
+## 9. IMPORTANT MONGOOSE METHODS
+
+CREATE:
+create()
+insertMany()
+
+READ:
+find()
+findOne()
+findById()
+exists()
+countDocuments()
+
+UPDATE:
+updateOne()
+updateMany()
+findOneAndUpdate()
+findByIdAndUpdate()
+
+DELETE:
+deleteOne()
+deleteMany()
+findOneAndDelete()
+findByIdAndDelete()
+
+OTHER USEFUL METHODS:
+
+sort() = Sorts query results.
+
+limit() = Restricts the number of results.
+
+select() = Selects specific fields.
+
+skip() = Skips a number of results.
+
+lean() = Returns plain JavaScript objects instead of Mongoose documents.
+
+populate() = Replaces referenced ObjectIds with related documents.
+
+exec() = Executes a Mongoose query and returns a promise.
+
+### Examples
+
+userModel.find().sort({ age: 1 })
+
+Ascending order.
+
+userModel.find().sort({ age: -1 })
+
+Descending order.
+
+userModel.find().select("name email")
+
+Returns selected fields.
+
+userModel.find().skip(5)
+
+Skips first five results.
+
+userModel.find().limit(5)
+
+Returns maximum five results.
+
+userModel.find().lean()
+
+Returns plain JavaScript objects.
+
+---
+
+## 10. IMPORTANT CONCEPTS
+
+### 1. _id
+
+Every MongoDB document has a unique _id field.
+
+MongoDB automatically generates an ObjectId if you do not provide one.
+
+Example:
+
+{
+    _id: ObjectId("...")
+}
+
+### 2. __v
+
+Mongoose adds __v by default as a version key.
+
+It can be used for document versioning and concurrency-related features.
+
+### 3. ObjectId
+
+ObjectId is a special BSON type commonly used for MongoDB document IDs and references.
+
+### 4. Validation
+
+Validation checks whether data follows the rules defined in the schema.
+
+Example:
+
+required: true
+
+### 5. Unique Index
+
+unique: true creates a database index that prevents duplicate values.
+
+It is not a normal Mongoose validator.
+
+Existing duplicate records must be cleaned before creating the unique index.
+
+### 6. Async and Await
+
+Database operations are asynchronous.
+
+async allows a function to use await.
+
+await waits for a Promise to settle before continuing.
+
+Example:
+
+const users = await userModel.find();
+
+### 7. Error Handling
+
+Use try-catch to handle database errors.
+
+Example:
+
+try {
+
+    const user = await userModel.create({
+        name: "Saumyaraj"
+    });
+
+    res.send(user);
+
+} catch (error) {
+
+    res.status(500).send(error.message);
+
+}
+
+---
+
+## 11. BEST PRACTICES
+
+1. Use POST for creating data.
+2. Use GET for reading data.
+3. Use PATCH or PUT for updating data.
+4. Use DELETE for deleting data.
+5. Never store database passwords directly in public code.
+6. Use environment variables (.env).
+7. Validate user input.
+8. Handle duplicate-key errors.
+9. Use try-catch for asynchronous database operations.
+10. Do not expose sensitive information in API responses.
+11. Do not use GET requests for database modifications.
+12. Add proper error handling and HTTP status codes.
+
+---
+
+## 12. COMPLETE CRUD SUMMARY
+
+CREATE:
+userModel.create()
+
+READ:
+userModel.find()
+userModel.findOne()
+userModel.findById()
+
+UPDATE:
+userModel.updateOne()
+userModel.updateMany()
+userModel.findOneAndUpdate()
+userModel.findByIdAndUpdate()
+
+DELETE:
+userModel.deleteOne()
+userModel.deleteMany()
+userModel.findOneAndDelete()
+userModel.findByIdAndDelete()
+
+FINAL UNDERSTANDING:
+
+MongoDB = Database
+
+Mongoose = ODM library
+
+Schema = Defines document structure and validation rules
+
+Model = Provides methods to interact with a collection
+
+Document = Actual record stored in MongoDB
+
+CRUD = Create, Read, Update, Delete
+
+Connection = Connects Node.js application with MongoDB
+
+Remember the relationship:
+
+MongoDB
+   |
+Database
+   |
+Collection
+   |
+Documents
+
+Node.js
+   |
+Mongoose (ODM)
+   |
+Schema
+   |
+Model
+   |
+CRUD Operations
+   |
+MongoDB Database
