@@ -1,0 +1,6 @@
+mongodb installation
+mongodb connection
+FULL ABOUT ODM AND ORM 
+schema
+model
+CRUD - create read update delete
