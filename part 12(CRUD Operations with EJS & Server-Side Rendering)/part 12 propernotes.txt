@@ -1,127 +1,189 @@
 # CRUD OPERATIONS WITH EJS & SERVER-SIDE RENDERING
+# COMPLETE NOTES (BASIC TO INDUSTRY LEVEL)
 
-## 1. WHAT IS SERVER-SIDE RENDERING (SSR)?
+==================================================
+1. WHAT IS SERVER-SIDE RENDERING (SSR)?
+==================================================
 
-Server-Side Rendering (SSR) is a technique in which HTML is generated on the server and then sent to the browser.
+SSR is a technique in which HTML is generated on the server and sent to the browser.
 
-Flow:
+FLOW:
 
-Browser → Request → Express Server → Database (if needed) → EJS Rendering → HTML Response → Browser
+Browser
+   |
+HTTP Request
+   |
+Express Server
+   |
+Database (if required)
+   |
+EJS Template Rendering
+   |
+Generated HTML
+   |
+Browser
 
-Example:
-When a user opens /users, the server fetches users from MongoDB, passes them to an EJS file, and sends the generated HTML to the browser.
+EXAMPLE:
+When a user opens /read:
+1. Browser sends GET request.
+2. Express receives the request.
+3. MongoDB returns users.
+4. Express passes users to EJS.
+5. EJS generates HTML.
+6. Browser displays the page.
 
-### SSR vs CSR
+SSR VS CSR:
 
 SSR:
 - HTML is generated on the server.
 - Browser receives ready-to-display HTML.
 - EJS is commonly used with Express.
 
-CSR (Client-Side Rendering):
-- Browser generates or updates the UI using JavaScript.
+CSR:
+- Browser generates or updates UI using JavaScript.
 - Commonly used with React.
 
-## 2. WHAT IS EJS?
+==================================================
+2. WHAT IS EJS?
+==================================================
 
-EJS stands for Embedded JavaScript Templates.
+EJS = Embedded JavaScript Templates.
 
-It allows us to write JavaScript inside HTML and dynamically generate HTML pages.
+EJS allows us to write JavaScript inside HTML and generate dynamic HTML pages.
 
-### Installation
+INSTALLATION:
 
 npm install express ejs mongoose
 
-### Configure EJS in Express
+CONFIGURATION:
 
 const express = require('express');
 const app = express();
 
 app.set('view engine', 'ejs');
 
-This tells Express to use EJS as its template engine.
+Express automatically searches for EJS files inside the views folder.
 
-By default, Express searches for EJS files inside the views folder.
-
-Project structure:
+PROJECT STRUCTURE:
 
 project/
 |
 |-- node_modules/
 |-- views/
 |   |-- index.ejs
-|   |-- users.ejs
+|   |-- create.ejs
+|   |-- read.ejs
 |   |-- edit.ejs
+|   |
+|   |-- partials/
+|       |-- header.ejs
+|       |-- footer.ejs
 |
 |-- public/
 |   |-- stylesheets/
+|   |   |-- style.css
+|   |
 |   |-- javascripts/
+|   |   |-- script.js
+|   |
 |   |-- images/
 |
 |-- app.js
 |-- usermodel.js
 |-- package.json
 
-## 3. EJS TAGS
+IMPORTANT:
+- views = EJS templates.
+- public = Static files.
+- node_modules = Installed packages.
+- app.js = Main server file.
+- usermodel.js = MongoDB model.
+
+==================================================
+3. EJS TAGS
+==================================================
 
 1. <%= %>
+
 Outputs a value and HTML-escapes it.
 
 Example:
+
 <%= username %>
 
 2. <%- %>
+
 Outputs unescaped HTML.
 
 Example:
+
 <%- htmlContent %>
 
-Use carefully because untrusted HTML can cause XSS attacks.
+Use only with trusted HTML because untrusted content can cause XSS attacks.
 
 3. <% %>
+
 Executes JavaScript without displaying its result.
 
 Example:
+
 <% let age = 18; %>
 
 4. <%# %>
-EJS comment. Not included in the output HTML.
+
+EJS comment. Not included in generated HTML.
 
 Example:
+
 <%# This is a comment %>
 
-5. <%- include('filename') %>
-Includes another EJS template.
+5. INCLUDE
+
+Includes another EJS file inside the current template.
 
 Example:
+
 <%- include('./partials/header') %>
 
-## 4. RENDERING EJS FILES
+Useful for reusable headers, footers and navigation bars.
+
+==================================================
+4. RENDERING EJS FILES
+==================================================
 
 Express uses res.render() to render an EJS template.
 
-Syntax:
+SYNTAX:
 
 res.render('filename', { key: value });
 
-Example:
+EXAMPLE (app.js):
 
 app.get('/', (req, res) => {
-    res.render('index', { name: 'Saumyaraj' });
+    res.render('index', {
+        name: 'Saumyaraj'
+    });
 });
 
-Inside index.ejs:
+INSIDE index.ejs:
 
 <h1>Welcome <%= name %></h1>
 
-Important:
-- res.send() sends a response.
-- res.render() renders a template and sends HTML.
-- res.redirect() redirects the browser to another route.
+IMPORTANT RESPONSE METHODS:
 
-## 5. PASSING DATA FROM BACKEND TO EJS
+res.send() = Sends a response.
 
-Backend:
+res.render() = Renders EJS and sends HTML.
+
+res.redirect() = Redirects the browser to another route.
+
+res.status() = Sets HTTP status code.
+
+==================================================
+5. PASSING DATA FROM BACKEND TO EJS
+==================================================
+
+BACKEND:
 
 app.get('/profile', (req, res) => {
 
@@ -139,9 +201,9 @@ profile.ejs:
 <h1><%= user.name %></h1>
 <p><%= user.age %></p>
 
-### Rendering arrays using EJS
+PASSING ARRAYS:
 
-Backend:
+BACKEND:
 
 const users = ["Rahul", "Aman", "Saumyaraj"];
 
@@ -153,23 +215,76 @@ users.ejs:
     <h2><%= user %></h2>
 <% }) %>
 
-## 6. FORM HANDLING
+CONDITIONAL RENDERING:
 
-Forms allow users to submit data to the server.
+<% if (users.length > 0) { %>
 
-Example HTML form:
+    <h1>Users Found</h1>
+
+<% } else { %>
+
+    <h1>No Users Found</h1>
+
+<% } %>
+
+IMPORTANT:
+- Backend passes data using res.render().
+- EJS receives the data using variable names.
+- EJS can use loops and conditions to generate dynamic HTML.
+
+==================================================
+6. EXPRESS REQUEST AND RESPONSE OBJECTS
+==================================================
+
+req.body:
+Contains submitted request body data.
+
+req.params:
+Contains dynamic route parameters.
+
+Example:
+
+Route:
+/user/:id
+
+req.params.id
+
+req.query:
+Contains query-string parameters.
+
+Example:
+
+/users?name=Saumyaraj
+
+req.query.name
+
+RESPONSE METHODS:
+
+res.send()
+res.render()
+res.redirect()
+res.status()
+res.json()
+
+==================================================
+7. FORM HANDLING AND BODY PARSERS
+==================================================
+
+HTML forms send data to the Express server.
+
+EXAMPLE HTML FORM:
 
 <form action="/create" method="POST">
 
-    <input type="text" name="name" placeholder="Enter name">
+    <input type="text" name="name">
 
-    <input type="email" name="email" placeholder="Enter email">
+    <input type="email" name="email">
 
     <button type="submit">Create User</button>
 
 </form>
 
-### Express body parsers
+BODY PARSERS:
 
 app.use(express.json());
 
@@ -177,20 +292,33 @@ Parses incoming JSON request bodies.
 
 app.use(express.urlencoded({ extended: true }));
 
-Parses URL-encoded form data.
+Parses URL-encoded HTML form data.
 
-Important:
+IMPORTANT:
 - req.body contains submitted form data.
+- name attribute determines the key in req.body.
 - Body parsers must be registered before routes that use req.body.
-- Input name attributes determine the keys inside req.body.
+- Without the appropriate parser, req.body may be undefined.
 
-## 7. CONNECTING MONGODB
+EXAMPLE:
 
-Install:
+HTML:
+
+<input type="text" name="username">
+
+BACKEND:
+
+let username = req.body.username;
+
+==================================================
+8. CONNECTING MONGODB WITH EXPRESS
+==================================================
+
+INSTALL:
 
 npm install mongoose
 
-Connection:
+CONNECTION:
 
 const mongoose = require('mongoose');
 
@@ -198,13 +326,20 @@ mongoose.connect('mongodb://127.0.0.1:27017/mydatabase')
 .then(() => console.log("MongoDB Connected"))
 .catch(err => console.log(err));
 
-## 8. SCHEMA AND MODEL
+IMPORTANT:
+mongoose.connect() is asynchronous.
 
-Schema defines the structure and validation rules of documents.
+For production, use environment variables instead of hardcoding database credentials.
 
-Model provides methods to interact with the MongoDB collection.
+==================================================
+9. SCHEMA AND MODEL
+==================================================
 
-usermodel.js:
+SCHEMA:
+
+Defines the structure and validation rules of MongoDB documents.
+
+EXAMPLE:
 
 const mongoose = require('mongoose');
 
@@ -212,77 +347,294 @@ const userSchema = mongoose.Schema({
 
     name: String,
     email: String,
-    username: String
+    image: String
 
 });
 
+MODEL:
+
+Provides methods to interact with MongoDB collections.
+
 const userModel = mongoose.model('user', userSchema);
+
+EXPORT:
 
 module.exports = userModel;
 
-Import in app.js:
+IMPORT IN app.js:
 
 const userModel = require('./usermodel');
 
-## 9. CRUD OPERATIONS WITH EJS
+IMPORTANT:
 
-CRUD = Create, Read, Update, Delete.
+Schema = Structure and rules.
 
-### A. CREATE (POST)
+Model = Interface to interact with MongoDB.
 
-Route:
+==================================================
+10. HOW HTML CONNECTS WITH CRUD OPERATIONS
+==================================================
+
+This is the most important connection between frontend and backend.
+
+HTML uses:
+
+1. <a href=""> for navigation and GET requests.
+2. <form action=""> to specify the backend route.
+3. method="GET" to retrieve pages/data.
+4. method="POST" to submit form data.
+5. name="" to identify submitted input values.
+6. <button type="submit"> to submit a form.
+
+CRUD CONNECTION:
+
+CREATE:
+
+<form action="/create" method="POST">
+
+    <input type="text" name="name">
+    <input type="email" name="email">
+
+    <button type="submit">Create</button>
+
+</form>
+
+Backend:
+
+app.post('/create', ...)
+
+READ:
+
+<a href="/read">Read Users</a>
+
+Backend:
+
+app.get('/read', ...)
+
+UPDATE:
+
+<a href="/edit/USER_ID">Edit User</a>
+
+Backend:
+
+app.get('/edit/:id', ...)
+
+Update form:
+
+<form action="/update/USER_ID" method="POST">
+
+    <input type="text" name="name">
+
+    <button type="submit">Update</button>
+
+</form>
+
+Backend:
+
+app.post('/update/:id', ...)
+
+DELETE:
+
+<form action="/delete/USER_ID" method="POST">
+
+    <button type="submit">Delete</button>
+
+</form>
+
+Backend:
+
+app.post('/delete/:id', ...)
+
+IMPORTANT:
+
+- href triggers navigation.
+- action specifies where the form submits data.
+- method specifies the HTTP request method.
+- name identifies the input field.
+- :id is a dynamic route parameter.
+- USER_ID above represents an actual user's MongoDB _id.
+
+HTML forms natively support GET and POST.
+For PUT, PATCH and DELETE form submissions, use method-override or JavaScript fetch.
+
+==================================================
+11. COMPLETE CRUD OPERATIONS WITH EJS
+==================================================
+
+CRUD:
+
+C = Create
+R = Read
+U = Update
+D = Delete
+
+Assume userModel is already imported.
+
+------------------------------------------
+A. CREATE OPERATION
+------------------------------------------
+
+STEP 1: CREATE FORM (create.ejs)
+
+<form action="/create" method="POST">
+
+    <input
+        type="text"
+        name="name"
+        placeholder="Enter name"
+        required
+    >
+
+    <input
+        type="email"
+        name="email"
+        placeholder="Enter email"
+        required
+    >
+
+    <input
+        type="text"
+        name="image"
+        placeholder="Image URL"
+    >
+
+    <button type="submit">Create User</button>
+
+</form>
+
+STEP 2: EXPRESS ROUTE (app.js)
 
 app.post('/create', async (req, res) => {
 
-    let { name, email, username } = req.body;
+    let { name, email, image } = req.body;
 
     await userModel.create({
         name,
         email,
-        username
+        image
     });
 
     res.redirect('/read');
 
 });
 
-Explanation:
-- req.body gets form data.
-- create() inserts a document into MongoDB.
-- redirect() sends the browser to another route.
+EXPLANATION:
 
-### B. READ (GET)
+1. User fills the HTML form.
+2. Form sends POST request to /create.
+3. Express receives the data through req.body.
+4. create() inserts a new document.
+5. redirect() sends the browser to /read.
 
-Route:
+STEP 3: OPEN CREATE PAGE
+
+app.get('/', (req, res) => {
+    res.render('create');
+});
+
+IMPORTANT:
+GET / opens the form.
+POST /create saves the user.
+
+------------------------------------------
+B. READ OPERATION
+------------------------------------------
+
+STEP 1: EXPRESS ROUTE
 
 app.get('/read', async (req, res) => {
 
     let users = await userModel.find();
 
-    res.render('users', { users });
+    res.render('read', { users });
 
 });
 
-users.ejs:
+STEP 2: READ PAGE (read.ejs)
 
-<% users.forEach(user => { %>
+<% if (users.length > 0) { %>
+
+    <% users.forEach(function(user) { %>
+
+        <div>
+
+            <h2><%= user.name %></h2>
+
+            <p><%= user.email %></p>
+
+            <img src="<%= user.image %>" alt="User image">
+
+        </div>
+
+    <% }) %>
+
+<% } else { %>
+
+    <h2>No Users Found</h2>
+
+<% } %>
+
+STEP 3: HTML LINK TO READ PAGE
+
+<a href="/read">Read Users</a>
+
+EXPLANATION:
+
+1. User clicks Read Users.
+2. Browser sends GET /read.
+3. find() retrieves users from MongoDB.
+4. res.render() passes users to read.ejs.
+5. EJS loops through the users.
+6. Browser displays all users.
+
+------------------------------------------
+C. UPDATE OPERATION
+------------------------------------------
+
+UPDATE HAS TWO MAIN STEPS:
+
+1. Fetch existing user and open edit form.
+2. Submit updated data and save it.
+
+STEP 1: EDIT BUTTON IN read.ejs
+
+<% users.forEach(function(user) { %>
 
     <h2><%= user.name %></h2>
-    <p><%= user.email %></p>
-    <p><%= user.username %></p>
+
+    <a href="/edit/<%= user._id %>">
+        Edit User
+    </a>
 
 <% }) %>
 
-Explanation:
-- find() retrieves matching documents.
-- res.render() sends the data to EJS.
-- EJS dynamically generates HTML.
+IMPORTANT:
 
-### C. UPDATE (POST)
+- href sends a GET request.
+- user._id identifies the selected user.
+- :id receives this value in Express.
 
-First, create an edit form.
+STEP 2: GET EDIT ROUTE (app.js)
 
-edit.ejs:
+app.get('/edit/:id', async (req, res) => {
+
+    let user = await userModel.findById(req.params.id);
+
+    if (!user) {
+        return res.status(404).send('User not found');
+    }
+
+    res.render('edit', { user });
+
+});
+
+EXPLANATION:
+
+- req.params.id gets the user's ID.
+- findById() fetches that particular user.
+- res.render() sends user data to edit.ejs.
+
+STEP 3: EDIT FORM (edit.ejs)
 
 <form action="/update/<%= user._id %>" method="POST">
 
@@ -298,45 +650,86 @@ edit.ejs:
         value="<%= user.email %>"
     >
 
-    <button type="submit">Update</button>
+    <input
+        type="text"
+        name="image"
+        value="<%= user.image %>"
+    >
+
+    <button type="submit">Update User</button>
 
 </form>
 
-Route to display the edit form:
+IMPORTANT:
 
-app.get('/edit/:id', async (req, res) => {
+value="<%= user.name %>"
 
-    let user = await userModel.findById(req.params.id);
+Displays the existing user's name inside the input.
 
-    res.render('edit', { user });
+action="/update/<%= user._id %>"
 
-});
+Sends updated form data to the route containing that user's ID.
 
-Route to update:
+STEP 4: POST UPDATE ROUTE (app.js)
 
 app.post('/update/:id', async (req, res) => {
 
-    let { name, email } = req.body;
+    let { name, email, image } = req.body;
 
     await userModel.findByIdAndUpdate(
         req.params.id,
-        { name, email },
-        { runValidators: true }
+        {
+            name,
+            email,
+            image
+        },
+        {
+            runValidators: true
+        }
     );
 
     res.redirect('/read');
 
 });
 
-Explanation:
-- :id is a dynamic route parameter.
-- req.params.id gets the user's ID.
-- findByIdAndUpdate() updates the document.
-- redirect() returns to the users page.
+EXPLANATION:
 
-### D. DELETE (POST)
+1. User changes input values.
+2. Form sends POST /update/:id.
+3. req.params.id identifies the user.
+4. req.body contains updated values.
+5. findByIdAndUpdate() updates MongoDB.
+6. Browser redirects to /read.
 
-Route:
+IMPORTANT:
+
+find() = Returns an array of matching documents.
+
+findOne() = Returns one matching document or null.
+
+findById() = Finds one document using _id.
+
+findByIdAndUpdate() = Updates one document using _id.
+
+------------------------------------------
+D. DELETE OPERATION
+------------------------------------------
+
+STEP 1: DELETE FORM IN read.ejs
+
+<% users.forEach(function(user) { %>
+
+    <h2><%= user.name %></h2>
+
+    <form action="/delete/<%= user._id %>" method="POST">
+
+        <button type="submit">Delete User</button>
+
+    </form>
+
+<% }) %>
+
+STEP 2: DELETE ROUTE (app.js)
 
 app.post('/delete/:id', async (req, res) => {
 
@@ -346,26 +739,103 @@ app.post('/delete/:id', async (req, res) => {
 
 });
 
-Form:
+EXPLANATION:
 
-<form action="/delete/<%= user._id %>" method="POST">
+1. User clicks Delete User.
+2. Form sends POST /delete/:id.
+3. req.params.id identifies the document.
+4. findByIdAndDelete() removes the document.
+5. Browser redirects to /read.
 
-    <button type="submit">Delete</button>
+IMPORTANT:
+Never use a normal GET link to delete a database record.
 
-</form>
+==================================================
+12. COMPLETE CRUD REQUEST FLOW
+==================================================
 
-Explanation:
-- req.params.id identifies the document.
-- findByIdAndDelete() deletes it.
-- redirect() returns to the users page.
+CREATE:
 
-## 10. STATIC FILES
+Browser
+   |
+GET /
+   |
+create.ejs
+   |
+POST /create
+   |
+req.body
+   |
+userModel.create()
+   |
+MongoDB
+   |
+Redirect /read
 
-Static files include CSS, JavaScript and images.
+READ:
 
-Create a public folder.
+Browser
+   |
+GET /read
+   |
+userModel.find()
+   |
+MongoDB
+   |
+res.render('read', { users })
+   |
+EJS generates HTML
+   |
+Browser
 
-Project structure:
+UPDATE:
+
+Browser
+   |
+GET /edit/:id
+   |
+userModel.findById()
+   |
+Render edit.ejs
+   |
+Display existing values
+   |
+POST /update/:id
+   |
+req.body + req.params.id
+   |
+findByIdAndUpdate()
+   |
+MongoDB
+   |
+Redirect /read
+
+DELETE:
+
+Browser
+   |
+POST /delete/:id
+   |
+req.params.id
+   |
+findByIdAndDelete()
+   |
+MongoDB
+   |
+Redirect /read
+
+==================================================
+13. STATIC FILES
+==================================================
+
+Static files include:
+
+- CSS
+- JavaScript
+- Images
+- Fonts
+
+CREATE public FOLDER:
 
 public/
 |
@@ -377,178 +847,331 @@ public/
 |
 |-- images/
 
-Configure:
+CONFIGURATION:
 
 app.use(express.static('public'));
 
-Link CSS inside EJS:
+CSS:
 
 <link rel="stylesheet" href="/stylesheets/style.css">
 
-Link JavaScript:
+JAVASCRIPT:
 
 <script src="/javascripts/script.js"></script>
 
-The public folder's name is not included in the browser URL.
+IMAGE:
 
-## 11. IMPORTANT EXPRESS CONCEPTS
+<img src="/images/profile.png" alt="Profile">
 
-req.body:
-Contains data submitted in the request body.
+IMPORTANT:
+The public folder name is not included in the browser URL.
 
-req.params:
-Contains dynamic route parameters.
+==================================================
+14. GET VS POST
+==================================================
 
-Example:
-/user/:id
+GET:
+- Used to retrieve resources.
+- Parameters can be passed through URL.
+- Can be bookmarked.
+- Should not modify database state.
 
-req.params.id
+POST:
+- Used to submit data.
+- Data is sent in request body.
+- Commonly used for creating records.
+- Also used for HTML form-based updates and deletions.
 
-req.query:
-Contains query-string parameters.
+IMPORTANT:
+HTTP also supports:
 
-Example:
-/users?name=Saumyaraj
+PUT = Replaces a resource.
 
-req.query.name
+PATCH = Partially updates a resource.
 
-res.send():
-Sends a response.
+DELETE = Deletes a resource.
+
+HTML forms natively support GET and POST only.
+
+==================================================
+15. ERROR HANDLING AND VALIDATION
+==================================================
+
+Use try-catch to handle asynchronous database errors.
+
+EXAMPLE:
+
+app.post('/create', async (req, res) => {
+
+    try {
+
+        let { name, email, image } = req.body;
+
+        await userModel.create({
+            name,
+            email,
+            image
+        });
+
+        res.redirect('/read');
+
+    } catch (error) {
+
+        res.status(500).send(error.message);
+
+    }
+
+});
+
+IMPORTANT VALIDATION:
+
+1. Validate required input fields.
+2. Validate email format.
+3. Check whether a user exists before updating.
+4. Handle invalid MongoDB ObjectIds.
+5. Handle duplicate-key errors.
+6. Handle database connection errors.
+7. Return correct HTTP status codes.
+
+COMMON STATUS CODES:
+
+200 = OK
+
+201 = Created
+
+302 = Redirect
+
+400 = Bad Request
+
+401 = Unauthorized
+
+403 = Forbidden
+
+404 = Not Found
+
+500 = Internal Server Error
+
+==================================================
+16. IMPORTANT SECURITY AND INDUSTRY PRACTICES
+==================================================
+
+1. Never use GET routes to modify or delete data.
+2. Validate all incoming form data on the server.
+3. Escape untrusted EJS output using <%= %>.
+4. Avoid rendering untrusted HTML using <%- %>.
+5. Use authentication before sensitive operations.
+6. Use authorization to check whether a user can edit/delete a record.
+7. Use environment variables for database credentials.
+8. Protect state-changing forms against CSRF.
+9. Use secure session and cookie settings.
+10. Use rate limiting where appropriate.
+11. Avoid exposing passwords and sensitive data.
+12. Handle database errors properly.
+13. Use proper HTTP status codes.
+14. Use pagination for large user collections.
+15. Add confirmation before destructive actions.
+16. Use HTTPS in production.
+
+==================================================
+17. COMPLETE APP.JS EXECUTION ORDER
+==================================================
+
+The following is the recommended basic structure.
+
+const express = require('express');
+const mongoose = require('mongoose');
+
+const app = express();
+
+const userModel = require('./usermodel');
+
+// 1. BODY PARSERS
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// 2. STATIC FILES
+app.use(express.static('public'));
+
+// 3. EJS CONFIGURATION
+app.set('view engine', 'ejs');
+
+// 4. HOME PAGE
+app.get('/', (req, res) => {
+    res.render('create');
+});
+
+// 5. CREATE
+app.post('/create', async (req, res) => {
+    let { name, email, image } = req.body;
+
+    await userModel.create({
+        name,
+        email,
+        image
+    });
+
+    res.redirect('/read');
+});
+
+// 6. READ
+app.get('/read', async (req, res) => {
+    let users = await userModel.find();
+
+    res.render('read', { users });
+});
+
+// 7. OPEN EDIT PAGE
+app.get('/edit/:id', async (req, res) => {
+    let user = await userModel.findById(req.params.id);
+
+    if (!user) {
+        return res.status(404).send('User not found');
+    }
+
+    res.render('edit', { user });
+});
+
+// 8. UPDATE
+app.post('/update/:id', async (req, res) => {
+    let { name, email, image } = req.body;
+
+    await userModel.findByIdAndUpdate(
+        req.params.id,
+        { name, email, image },
+        { runValidators: true }
+    );
+
+    res.redirect('/read');
+});
+
+// 9. DELETE
+app.post('/delete/:id', async (req, res) => {
+    await userModel.findByIdAndDelete(req.params.id);
+
+    res.redirect('/read');
+});
+
+// 10. DATABASE CONNECTION AND SERVER START
+mongoose.connect('mongodb://127.0.0.1:27017/mydatabase')
+.then(() => {
+
+    console.log('MongoDB Connected');
+
+    app.listen(3000, () => {
+        console.log('Server running on port 3000');
+    });
+
+})
+.catch(err => console.log(err));
+
+NOTE:
+This is a basic learning example. Add centralized error handling, input validation, authentication and authorization before production use.
+
+==================================================
+18. FINAL QUICK REVISION
+==================================================
+
+EJS:
+Embedded JavaScript Templates.
+
+SSR:
+HTML generated on the server.
 
 res.render():
 Renders an EJS template.
 
-res.redirect():
-Redirects the browser.
+<%= %>:
+Outputs HTML-escaped values.
 
-res.status():
-Sets the HTTP status code.
+<%- %>:
+Outputs unescaped HTML.
 
-## 12. GET VS POST
+<% %>:
+Executes JavaScript.
 
-GET:
-- Used to retrieve data.
-- Data is generally passed through URL/query parameters.
-- Can be bookmarked.
+req.body:
+Submitted form data.
 
-POST:
-- Used to submit data.
-- Data is sent in the request body.
-- Commonly used for creating records and HTML form submissions.
+req.params:
+Dynamic route parameters.
 
-IMPORTANT:
-Traditional HTML forms support GET and POST directly.
-For PUT, PATCH and DELETE form submissions, use method-override or another appropriate approach.
+req.query:
+Query-string parameters.
 
-## 13. IMPORTANT SECURITY AND BEST PRACTICES
+express.json():
+Parses JSON request bodies.
 
-1. Never use GET routes to modify or delete database records.
-2. Validate all incoming form data.
-3. Use try-catch for asynchronous database operations.
-4. Escape untrusted output using <%= %>.
-5. Never render untrusted HTML using <%- %>.
-6. Protect against unauthorized updates and deletions.
-7. Use environment variables for database credentials.
-8. Handle missing users with HTTP 404.
-9. Use POST/PUT/PATCH/DELETE according to the operation.
-10. Use CSRF protection for state-changing form requests in production.
+express.urlencoded():
+Parses URL-encoded form data.
 
-## 14. COMPLETE REQUEST FLOW
+express.static():
+Serves static files.
 
-CREATE:
+HTML CONNECTION:
 
-Browser Form
-    |
-POST /create
-    |
-req.body
-    |
-Mongoose create()
-    |
-MongoDB
-    |
-Redirect /read
+<a href="/read"> = Navigation / GET
 
-READ:
+<form action="/create" method="POST">
+= Submit form to create route.
 
-Browser
-    |
-GET /read
-    |
-Mongoose find()
-    |
-MongoDB
-    |
-res.render()
-    |
-EJS generates HTML
-    |
-Browser displays users
+name="email" = req.body.email
 
-UPDATE:
-
-Browser
-    |
-GET /edit/:id
-    |
-Fetch user
-    |
-Render edit.ejs
-    |
-POST /update/:id
-    |
-req.body + req.params.id
-    |
-findByIdAndUpdate()
-    |
-MongoDB
-
-DELETE:
-
-Browser
-    |
-POST /delete/:id
-    |
-req.params.id
-    |
-findByIdAndDelete()
-    |
-MongoDB
-    |
-Redirect /read
-
-## 15. FINAL REVISION
-
-EJS = Embedded JavaScript Templates.
-
-SSR = HTML generated on the server.
-
-res.render() = Renders EJS and sends HTML.
-
-<%= %> = Outputs escaped value.
-
-<%- %> = Outputs unescaped value.
-
-<% %> = Executes JavaScript.
-
-req.body = Form/request body data.
-
-req.params = Dynamic URL parameters.
-
-req.query = URL query parameters.
-
-express.urlencoded() = Parses HTML form data.
-
-express.json() = Parses JSON data.
-
-express.static() = Serves static files.
+action="/edit/ID" = Submit or navigate using a particular ID.
 
 CRUD:
-Create = create()
-Read = find()
-Update = findByIdAndUpdate()
-Delete = findByIdAndDelete()
 
-FINAL FLOW:
+CREATE:
+HTML form → POST /create → create()
 
-HTML FORM → EXPRESS ROUTE → MONGOOSE MODEL → MONGODB → EJS TEMPLATE → HTML RESPONSE → BROWSER
+READ:
+<a href="/read"> → GET /read → find()
+
+UPDATE:
+<a href="/edit/ID"> → GET /edit/:id → findById()
+
+Update form → POST /update/:id → findByIdAndUpdate()
+
+DELETE:
+Delete form → POST /delete/:id → findByIdAndDelete()
+
+FINAL UNDERSTANDING:
+
+HTML = Structure and forms.
+
+CSS = Styling.
+
+JavaScript = Client-side behavior.
+
+Express = Routing and backend logic.
+
+EJS = Dynamic HTML generation.
+
+Mongoose = MongoDB interaction.
+
+MongoDB = Database.
+
+SSR = Server generates HTML and sends it to browser.
+
+COMPLETE FLOW:
+
+HTML
+  |
+FORM / LINK
+  |
+HTTP REQUEST
+  |
+EXPRESS ROUTE
+  |
+REQUEST DATA
+  |
+MONGOOSE MODEL
+  |
+MONGODB
+  |
+EJS TEMPLATE
+  |
+GENERATED HTML
+  |
+BROWSER
+
+END OF NOTES
