@@ -1,0 +1,1270 @@
+# MONGODB — COMPLETE NOTES (BASIC TO INDUSTRY LEVEL)
+
+==================================================
+1. WHAT IS MONGODB?
+==================================================
+
+MongoDB is a NoSQL, document-oriented database used to store data in flexible, JSON-like documents.
+
+Unlike SQL databases, MongoDB stores data in collections and documents instead of tables and rows.
+
+IMPORTANT TERMINOLOGY:
+
+- Database: Container for collections.
+- Collection: Group of related documents.
+- Document: Individual data record.
+- Field: Key-value pair inside a document.
+- _id: Unique identifier of every document.
+- BSON: Binary JSON format used internally by MongoDB.
+- Namespace: Combination of database and collection name.
+
+EXAMPLE DOCUMENT:
+
+{
+    "_id": ObjectId("..."),
+    "name": "Saumyaraj",
+    "age": 18,
+    "email": "example@gmail.com",
+    "skills": ["HTML", "CSS", "JavaScript"]
+}
+
+SQL VS MONGODB:
+
+SQL              MongoDB
+Database         Database
+Table            Collection
+Row              Document
+Column           Field
+Primary Key      _id
+JOIN             $lookup
+
+IMPORTANT:
+- MongoDB is schema-flexible, not schema-free.
+- Documents in one collection can have different structures.
+- MongoDB supports transactions and relationships too.
+
+==================================================
+2. MONGODB ARCHITECTURE
+==================================================
+
+MongoDB has three important components:
+
+1. MongoDB Server:
+   Stores and manages databases.
+
+2. MongoDB Shell (mongosh):
+   Command-line interface for interacting with MongoDB.
+
+3. MongoDB Compass:
+   GUI application to view and manage databases.
+
+INSTALLATION:
+https://www.mongodb.com/try/download/community
+
+Install MongoDB Community Server and Compass.
+Install mongosh separately if it is not included.
+
+CHECK VERSION:
+
+mongod --version
+mongosh --version
+
+CONNECT:
+
+mongosh
+
+DEFAULT PORT:
+27017
+
+DEFAULT LOCAL CONNECTION:
+
+mongodb://127.0.0.1:27017
+
+==================================================
+3. BASIC MONGODB COMMANDS
+==================================================
+
+SHOW DATABASES:
+
+show dbs
+
+CREATE / SWITCH DATABASE:
+
+use college
+
+SHOW CURRENT DATABASE:
+
+db
+
+SHOW COLLECTIONS:
+
+show collections
+
+CREATE COLLECTION:
+
+db.createCollection("users")
+
+DROP COLLECTION:
+
+db.users.drop()
+
+DROP DATABASE:
+
+db.dropDatabase()
+
+IMPORTANT:
+MongoDB creates a database and collection automatically when data is first written if they do not exist.
+
+==================================================
+4. BSON AND DATA TYPES
+==================================================
+
+MongoDB stores documents in BSON (Binary JSON).
+
+IMPORTANT BSON TYPES:
+
+1. String
+2. Double
+3. Int32
+4. Int64 (Long)
+5. Decimal128
+6. Boolean
+7. Date
+8. ObjectId
+9. Array
+10. Embedded Document
+11. Null
+12. Binary Data
+13. Timestamp
+14. Regular Expression
+
+EXAMPLE:
+
+{
+    name: "Saumyaraj",
+    age: NumberInt(18),
+    salary: NumberDecimal("25000.50"),
+    active: true,
+    createdAt: new Date(),
+    skills: ["Java", "MongoDB"],
+    address: {
+        city: "Indore",
+        state: "MP"
+    }
+}
+
+IMPORTANT:
+- ObjectId is commonly used for unique document identification.
+- Date stores date/time information.
+- Decimal128 is useful for precise decimal values.
+- Arrays store multiple values.
+- Embedded documents store nested objects.
+
+==================================================
+5. INSERT DOCUMENTS (CREATE)
+==================================================
+
+1. insertOne()
+
+Inserts one document.
+
+db.users.insertOne({
+    name: "Saumyaraj",
+    age: 18,
+    email: "test@gmail.com"
+})
+
+2. insertMany()
+
+Inserts multiple documents.
+
+db.users.insertMany([
+    { name: "Rahul", age: 20 },
+    { name: "Aman", age: 21 },
+    { name: "Rohit", age: 19 }
+])
+
+IMPORTANT:
+- MongoDB automatically generates _id if not provided.
+- _id must be unique.
+- insertMany() supports ordered and unordered insertion.
+- ordered: false continues processing other documents when an insertion fails.
+
+==================================================
+6. READ DOCUMENTS (RETRIEVE)
+==================================================
+
+1. find()
+
+Returns all matching documents.
+
+db.users.find()
+
+2. findOne()
+
+Returns the first matching document.
+
+db.users.findOne({ name: "Saumyaraj" })
+
+3. Find with condition:
+
+db.users.find({ age: 18 })
+
+4. Find all:
+
+db.users.find({})
+
+5. Find by ID:
+
+db.users.findOne({
+    _id: ObjectId("YOUR_OBJECT_ID")
+})
+
+6. Find with multiple conditions:
+
+db.users.find({
+    age: 18,
+    city: "Indore"
+})
+
+Multiple fields in a normal query imply AND.
+
+7. Find with projection:
+
+db.users.find(
+    {},
+    { name: 1, email: 1, _id: 0 }
+)
+
+1 = Include field
+0 = Exclude field
+
+IMPORTANT:
+Normally, inclusion and exclusion cannot be mixed in one projection, except for _id.
+
+==================================================
+7. QUERY OPERATORS
+==================================================
+
+Operators are used to filter documents based on conditions.
+
+A. COMPARISON OPERATORS
+
+$eq  = Equal
+$ne  = Not equal
+$gt  = Greater than
+$gte = Greater than or equal
+$lt  = Less than
+$lte = Less than or equal
+$in  = Matches any value in an array
+$nin = Matches none of the values
+
+EXAMPLES:
+
+db.users.find({ age: { $gt: 18 } })
+
+db.users.find({ age: { $gte: 18 } })
+
+db.users.find({ age: { $lt: 25 } })
+
+db.users.find({
+    age: { $in: [18, 20, 22] }
+})
+
+B. LOGICAL OPERATORS
+
+$and = All conditions must match.
+$or  = At least one condition must match.
+$not = Negates a condition.
+$nor = None of the conditions should match.
+
+EXAMPLES:
+
+db.users.find({
+    $or: [
+        { age: 18 },
+        { city: "Indore" }
+    ]
+})
+
+db.users.find({
+    $and: [
+        { age: { $gte: 18 } },
+        { age: { $lte: 25 } }
+    ]
+})
+
+C. ELEMENT OPERATORS
+
+$exists = Checks whether a field exists.
+$type   = Checks the BSON data type.
+
+db.users.find({
+    email: { $exists: true }
+})
+
+db.users.find({
+    age: { $type: "int" }
+})
+
+D. ARRAY OPERATORS
+
+$all       = Matches all specified array elements.
+$elemMatch = Matches array elements using multiple conditions.
+$size      = Matches arrays with a specific length.
+
+db.users.find({
+    skills: { $all: ["Java", "MongoDB"] }
+})
+
+db.students.find({
+    marks: { $elemMatch: { $gte: 70, $lt: 90 } }
+})
+
+db.users.find({
+    skills: { $size: 3 }
+})
+
+==================================================
+8. UPDATE DOCUMENTS
+==================================================
+
+1. updateOne()
+
+Updates the first matching document.
+
+db.users.updateOne(
+    { name: "Saumyaraj" },
+    { $set: { age: 19 } }
+)
+
+2. updateMany()
+
+Updates all matching documents.
+
+db.users.updateMany(
+    { city: "Indore" },
+    { $set: { active: true } }
+)
+
+3. replaceOne()
+
+Replaces the entire document except its _id.
+
+db.users.replaceOne(
+    { name: "Saumyaraj" },
+    {
+        name: "Saumyaraj",
+        age: 19
+    }
+)
+
+IMPORTANT:
+Fields not included in replacement are removed.
+
+4. Upsert:
+
+Creates a document if no matching document exists.
+
+db.users.updateOne(
+    { email: "new@gmail.com" },
+    { $set: { name: "New User" } },
+    { upsert: true }
+)
+
+==================================================
+9. UPDATE OPERATORS
+==================================================
+
+$set:
+Sets or changes a field.
+
+$unset:
+Removes a field.
+
+$inc:
+Increments a numeric value.
+
+$mul:
+Multiplies a numeric value.
+
+$rename:
+Renames a field.
+
+$min:
+Updates only if the new value is smaller.
+
+$max:
+Updates only if the new value is larger.
+
+$push:
+Adds an element to an array.
+
+$pull:
+Removes matching array elements.
+
+$addToSet:
+Adds an element only if it does not already exist.
+
+$pop:
+Removes the first or last array element.
+
+EXAMPLES:
+
+db.users.updateOne(
+    { name: "Rahul" },
+    { $inc: { age: 1 } }
+)
+
+db.users.updateOne(
+    { name: "Rahul" },
+    { $unset: { city: "" } }
+)
+
+db.users.updateOne(
+    { name: "Rahul" },
+    { $push: { skills: "React" } }
+)
+
+db.users.updateOne(
+    { name: "Rahul" },
+    { $addToSet: { skills: "Java" } }
+)
+
+db.users.updateOne(
+    { name: "Rahul" },
+    { $pull: { skills: "HTML" } }
+)
+
+==================================================
+10. DELETE DOCUMENTS
+==================================================
+
+1. deleteOne():
+
+Deletes the first matching document.
+
+db.users.deleteOne({
+    name: "Rahul"
+})
+
+2. deleteMany():
+
+Deletes all matching documents.
+
+db.users.deleteMany({
+    active: false
+})
+
+3. Delete all documents:
+
+db.users.deleteMany({})
+
+4. Delete collection:
+
+db.users.drop()
+
+5. Delete database:
+
+db.dropDatabase()
+
+IMPORTANT:
+deleteMany({}) deletes every document in that collection.
+
+==================================================
+11. SORT, LIMIT, SKIP AND PAGINATION
+==================================================
+
+SORT:
+
+db.users.find().sort({ age: 1 })
+
+1 = Ascending
+-1 = Descending
+
+LIMIT:
+
+db.users.find().limit(5)
+
+Returns maximum five documents.
+
+SKIP:
+
+db.users.find().skip(5)
+
+Skips first five documents.
+
+PAGINATION:
+
+let page = 2;
+let limit = 10;
+
+db.users.find()
+    .skip((page - 1) * limit)
+    .limit(limit)
+
+For page 2, skips first 10 documents and returns next 10.
+
+INDUSTRY TIP:
+For large datasets, cursor-based pagination using indexed fields is generally more efficient than large skip values.
+
+==================================================
+12. NESTED DOCUMENTS AND ARRAYS
+==================================================
+
+MongoDB supports nested objects and arrays.
+
+NESTED DOCUMENT:
+
+{
+    name: "Saumyaraj",
+    address: {
+        city: "Indore",
+        state: "Madhya Pradesh"
+    }
+}
+
+QUERY NESTED FIELD:
+
+db.users.find({
+    "address.city": "Indore"
+})
+
+UPDATE NESTED FIELD:
+
+db.users.updateOne(
+    { name: "Saumyaraj" },
+    { $set: { "address.city": "Bhopal" } }
+)
+
+ARRAY DOCUMENT:
+
+{
+    name: "Saumyaraj",
+    skills: ["HTML", "CSS", "JavaScript"]
+}
+
+QUERY ARRAY:
+
+db.users.find({
+    skills: "JavaScript"
+})
+
+IMPORTANT:
+- Dot notation accesses nested fields.
+- Arrays can contain values or embedded documents.
+- Embedded documents allow related data to be stored together.
+
+==================================================
+13. DATA MODELING AND RELATIONSHIPS
+==================================================
+
+MongoDB supports two major data modeling approaches.
+
+A. EMBEDDING
+
+Stores related information inside the same document.
+
+{
+    name: "Saumyaraj",
+    address: {
+        city: "Indore",
+        pincode: 452001
+    }
+}
+
+Advantages:
+- Fewer queries.
+- Related data is available together.
+- Atomic updates within one document.
+
+Disadvantages:
+- Document can become large.
+- Repeated data can increase storage.
+
+B. REFERENCING
+
+Stores another document's ObjectId as a reference.
+
+USER:
+
+{
+    _id: ObjectId("..."),
+    name: "Saumyaraj"
+}
+
+ORDER:
+
+{
+    userId: ObjectId("...")
+}
+
+Advantages:
+- Avoids unnecessary duplication.
+- Useful for large or independently changing data.
+- Suitable for many-to-many relationships.
+
+Disadvantages:
+- Requires additional queries or $lookup.
+
+RELATIONSHIP TYPES:
+
+1. One-to-One
+   One user has one profile.
+
+2. One-to-Many
+   One user has many orders.
+
+3. Many-to-Many
+   Many students belong to many courses.
+
+IMPORTANT:
+Choose embedding or referencing based on access patterns, data size and update requirements.
+
+==================================================
+14. AGGREGATION FRAMEWORK
+==================================================
+
+Aggregation processes documents through multiple stages called a pipeline.
+
+SYNTAX:
+
+db.collection.aggregate([
+    { stage1: {} },
+    { stage2: {} },
+    { stage3: {} }
+])
+
+IMPORTANT STAGES:
+
+$match:
+Filters documents.
+
+$group:
+Groups documents.
+
+$project:
+Selects or transforms fields.
+
+$sort:
+Sorts documents.
+
+$limit:
+Limits results.
+
+$skip:
+Skips documents.
+
+$count:
+Counts documents.
+
+$unwind:
+Deconstructs an array into separate documents.
+
+$lookup:
+Performs a left outer join with another collection.
+
+$addFields:
+Adds or modifies fields.
+
+$set:
+Adds or modifies fields.
+
+$unset:
+Removes fields.
+
+$replaceRoot:
+Replaces the document root.
+
+$facet:
+Runs multiple aggregation pipelines on the same input.
+
+$bucket:
+Groups values into specified ranges.
+
+AGGREGATION EXAMPLES:
+
+1. MATCH:
+
+db.users.aggregate([
+    { $match: { age: { $gte: 18 } } }
+])
+
+2. GROUP:
+
+db.users.aggregate([
+    {
+        $group: {
+            _id: "$city",
+            totalUsers: { $sum: 1 },
+            averageAge: { $avg: "$age" }
+        }
+    }
+])
+
+3. PROJECT:
+
+db.users.aggregate([
+    {
+        $project: {
+            name: 1,
+            age: 1,
+            _id: 0
+        }
+    }
+])
+
+4. LOOKUP:
+
+db.orders.aggregate([
+    {
+        $lookup: {
+            from: "users",
+            localField: "userId",
+            foreignField: "_id",
+            as: "userDetails"
+        }
+    }
+])
+
+5. UNWIND:
+
+db.users.aggregate([
+    { $unwind: "$skills" }
+])
+
+IMPORTANT:
+- $sum calculates totals.
+- $avg calculates averages.
+- $min and $max find minimum and maximum.
+- $first and $last select values within a group.
+- $push creates arrays of values.
+- $addToSet creates arrays of unique values.
+
+==================================================
+15. INDEXING
+==================================================
+
+An index improves query performance by allowing MongoDB to locate documents without scanning the entire collection.
+
+Without a suitable index:
+MongoDB may perform a COLLSCAN.
+
+With a suitable index:
+MongoDB can perform an efficient IXSCAN.
+
+CREATE INDEX:
+
+db.users.createIndex({ email: 1 })
+
+UNIQUE INDEX:
+
+db.users.createIndex(
+    { email: 1 },
+    { unique: true }
+)
+
+COMPOUND INDEX:
+
+db.users.createIndex({
+    city: 1,
+    age: -1
+})
+
+TYPES OF INDEXES:
+
+1. Single Field Index
+2. Compound Index
+3. Multikey Index (arrays)
+4. Text Index
+5. Geospatial Index (2dsphere / 2d)
+6. Hashed Index
+7. TTL Index
+8. Wildcard Index
+
+VIEW INDEXES:
+
+db.users.getIndexes()
+
+DROP INDEX:
+
+db.users.dropIndex("email_1")
+
+IMPORTANT CONCEPTS:
+
+- Indexes improve reads but consume storage.
+- Indexes add overhead to insert, update and delete operations.
+- Compound index field order matters.
+- Use indexes according to actual query patterns.
+- A unique index prevents duplicate indexed values.
+- A TTL index automatically removes eligible expired documents.
+
+==================================================
+16. QUERY PERFORMANCE AND OPTIMIZATION
+==================================================
+
+EXPLAIN:
+
+db.users.find({
+    email: "test@gmail.com"
+}).explain("executionStats")
+
+IMPORTANT METRICS:
+
+COLLSCAN = Collection scan.
+
+IXSCAN = Index scan.
+
+nReturned = Documents returned.
+
+totalDocsExamined = Documents examined.
+
+totalKeysExamined = Index keys examined.
+
+executionTimeMillis = Execution time measurement.
+
+OPTIMIZATION:
+
+1. Create indexes for frequent queries.
+2. Avoid unnecessary full collection scans.
+3. Use projection to return only required fields.
+4. Avoid unbounded arrays.
+5. Use pagination.
+6. Filter early in aggregation pipelines.
+7. Avoid unnecessary $lookup operations.
+8. Monitor slow queries.
+9. Use suitable compound indexes.
+10. Check explain("executionStats") before optimizing.
+
+IMPORTANT:
+An index is not automatically beneficial for every query.
+
+==================================================
+17. ATOMICITY AND TRANSACTIONS
+==================================================
+
+ATOMICITY:
+
+A single MongoDB document write is atomic, even when multiple fields are changed.
+
+TRANSACTION:
+
+A transaction groups multiple database operations into one logical operation.
+
+Either all operations commit or the transaction is rolled back.
+
+Useful when multiple documents or collections must remain consistent.
+
+IMPORTANT:
+
+- Single-document writes are atomic.
+- Multi-document transactions require a replica set or sharded cluster.
+- Transactions have performance costs.
+- Keep transactions short.
+
+CONCEPTS:
+
+ACID:
+
+A = Atomicity
+C = Consistency
+I = Isolation
+D = Durability
+
+MongoDB supports multi-document ACID transactions.
+
+==================================================
+18. REPLICATION AND REPLICA SETS
+==================================================
+
+Replication maintains multiple copies of data across MongoDB servers.
+
+A Replica Set contains multiple MongoDB nodes.
+
+TYPES:
+
+1. Primary:
+   Receives normal writes.
+
+2. Secondary:
+   Replicates data from the primary.
+
+3. Arbiter:
+   Participates in elections but does not store data.
+
+IMPORTANT:
+
+- Primary handles writes.
+- Secondary nodes replicate the primary's data.
+- If primary fails, an eligible secondary can be elected.
+- Replication improves availability and redundancy.
+- Replication is not a replacement for backups.
+
+==================================================
+19. SHARDING
+==================================================
+
+Sharding distributes data across multiple machines.
+
+It is used for horizontal scaling when a single server cannot efficiently handle the workload.
+
+IMPORTANT COMPONENTS:
+
+1. Shard:
+   Stores a portion of the data.
+
+2. Config Servers:
+   Store cluster metadata and configuration.
+
+3. Mongos:
+   Query router that directs operations to appropriate shards.
+
+SHARD KEY:
+
+A field or combination of fields used to distribute documents across shards.
+
+SHARDING TYPES:
+
+- Ranged Sharding
+- Hashed Sharding
+- Zone Sharding
+
+IMPORTANT:
+A poor shard key can cause uneven data distribution and performance problems.
+
+Replication = High Availability.
+
+Sharding = Horizontal Scalability.
+
+==================================================
+20. CHANGE STREAMS
+==================================================
+
+Change Streams allow applications to listen for database changes in real time.
+
+Changes include:
+
+- Insert
+- Update
+- Replace
+- Delete
+
+Used in:
+- Notifications.
+- Real-time applications.
+- Event-driven systems.
+- Data synchronization.
+
+Change Streams require a replica set or sharded cluster.
+
+==================================================
+21. BACKUP AND RESTORE
+==================================================
+
+BACKUP:
+
+mongodump --db college --out ./backup
+
+RESTORE:
+
+mongorestore --db college ./backup/college
+
+IMPORTANT TOOLS:
+
+mongodump = Creates binary backups.
+
+mongorestore = Restores binary backups.
+
+mongoexport = Exports collection data as JSON or CSV.
+
+mongoimport = Imports JSON or CSV data.
+
+IMPORTANT:
+- Use regular backups.
+- Test restoration.
+- Plan recovery time and recovery point objectives.
+- Atlas also provides managed backup options depending on the plan.
+
+==================================================
+22. SECURITY
+==================================================
+
+IMPORTANT SECURITY PRACTICES:
+
+1. Enable authentication.
+2. Create dedicated database users.
+3. Apply Role-Based Access Control (RBAC).
+4. Follow the Principle of Least Privilege.
+5. Use strong passwords.
+6. Restrict network access.
+7. Use TLS/SSL for encrypted connections.
+8. Never expose database credentials.
+9. Store connection strings in environment variables.
+10. Keep MongoDB updated.
+11. Avoid exposing MongoDB directly to the public internet.
+12. Monitor database access.
+
+RBAC:
+
+Role-Based Access Control defines what a database user is allowed to do.
+
+IMPORTANT BUILT-IN ROLES:
+
+read
+readWrite
+dbAdmin
+userAdmin
+dbOwner
+root
+
+==================================================
+23. MONGODB ATLAS
+==================================================
+
+MongoDB Atlas is MongoDB's managed cloud database service.
+
+It provides:
+
+- Cloud-hosted databases.
+- Cluster management.
+- Network access controls.
+- Database users.
+- Monitoring.
+- Backups.
+- Scaling.
+- Performance insights.
+
+CONNECTION STRING EXAMPLE:
+
+mongodb+srv://username:password@cluster.example.mongodb.net/college
+
+IMPORTANT:
+- Replace placeholders with actual credentials.
+- Never upload secrets to GitHub.
+- Use .env for credentials.
+- Configure IP access and database permissions.
+- Use an appropriate production cluster configuration.
+
+==================================================
+24. INDUSTRY-LEVEL DATABASE DESIGN
+==================================================
+
+IMPORTANT DESIGN PRINCIPLES:
+
+1. Design around application query patterns.
+2. Choose embedding or referencing carefully.
+3. Avoid unnecessary data duplication.
+4. Avoid unbounded arrays.
+5. Use indexes strategically.
+6. Use validation for data quality.
+7. Plan for document growth.
+8. Avoid excessive document size.
+9. Use pagination for large results.
+10. Consider read/write frequency.
+11. Plan backup and recovery.
+12. Monitor performance continuously.
+
+IMPORTANT LIMIT:
+A MongoDB BSON document has a maximum size of 16 MiB.
+
+SCHEMA DESIGN CONSIDERATIONS:
+
+- Data access patterns.
+- Data relationships.
+- Document size.
+- Update frequency.
+- Read/write ratio.
+- Index requirements.
+- Scalability.
+
+==================================================
+25. ADDITIONAL ADVANCED CONCEPTS
+==================================================
+
+1. GridFS:
+   Stores and retrieves files larger than the BSON document size limit.
+
+2. Read Concern:
+   Controls the consistency and isolation properties of read operations.
+
+3. Write Concern:
+   Controls the acknowledgment level requested for write operations.
+
+4. Read Preference:
+   Determines which replica set members can serve read operations.
+
+5. Connection Pooling:
+   Reuses database connections to reduce connection overhead.
+
+6. Capped Collections:
+   Fixed-size collections that maintain insertion order and overwrite old entries when full.
+
+7. Time Series Collections:
+   Optimized for time-stamped measurement data.
+
+8. Collation:
+   Controls language-specific string comparison and sorting rules.
+
+9. Validation Rules:
+   Enforce document structure using collection-level JSON Schema validation.
+
+10. Explain Plan:
+    Shows how MongoDB executes a query.
+
+11. Retryable Writes:
+    Allows certain supported write operations to be retried after certain transient failures.
+
+12. Write Conflicts:
+    Occur when concurrent operations conflict during execution.
+
+13. Database Profiler:
+    Records database operation performance information.
+
+14. Atlas Monitoring:
+    Tracks database metrics, resource usage and performance.
+
+==================================================
+26. INDUSTRY-LEVEL PROJECT PRACTICE
+==================================================
+
+Build these projects to apply MongoDB concepts:
+
+BEGINNER:
+1. Student Management System.
+2. Contact Management System.
+3. Notes Application.
+
+INTERMEDIATE:
+4. Blog Backend with Users and Comments.
+5. E-commerce Database.
+6. Expense Tracker.
+7. Course Management System.
+
+ADVANCED:
+8. E-commerce Backend with Orders, Payments and Inventory.
+9. Social Media Backend with Posts, Likes and Comments.
+10. Real-Time Notification System using Change Streams.
+11. Analytics Dashboard using Aggregation.
+12. Scalable Multi-tenant Database System.
+
+==================================================
+27. FINAL QUICK REVISION
+==================================================
+
+DATABASE:
+show dbs
+use databaseName
+db
+show collections
+
+CREATE:
+insertOne()
+insertMany()
+
+READ:
+find()
+findOne()
+
+UPDATE:
+updateOne()
+updateMany()
+replaceOne()
+
+DELETE:
+deleteOne()
+deleteMany()
+
+FILTERING:
+$eq, $ne, $gt, $gte, $lt, $lte
+$in, $nin, $and, $or, $not, $nor
+$exists, $type, $all, $elemMatch, $size
+
+UPDATE OPERATORS:
+$set, $unset, $inc, $mul, $rename
+$push, $pull, $addToSet, $pop
+
+CURSORS:
+sort()
+limit()
+skip()
+projection
+
+AGGREGATION:
+$match, $group, $project, $sort
+$limit, $skip, $lookup, $unwind
+$count, $addFields, $facet
+
+INDEXING:
+createIndex()
+getIndexes()
+dropIndex()
+explain()
+
+SCALABILITY:
+Replication
+Replica Sets
+Sharding
+Connection Pooling
+
+PRODUCTION:
+Transactions
+Security
+Authentication
+RBAC
+Backup and Restore
+Monitoring
+MongoDB Atlas
+
+==================================================
+FINAL UNDERSTANDING
+==================================================
+
+MongoDB = NoSQL Document Database
+
+Database = Collection of collections
+
+Collection = Group of documents
+
+Document = Actual stored record
+
+BSON = Binary representation of documents
+
+ObjectId = Unique document identifier
+
+CRUD = Create, Read, Update, Delete
+
+Query Operators = Filter documents
+
+Update Operators = Modify document fields
+
+Aggregation = Process and analyze data
+
+Indexing = Improve query performance
+
+Embedding = Store related data together
+
+Referencing = Connect documents using IDs
+
+Transactions = Execute multiple operations atomically
+
+Replication = Maintain multiple copies of data
+
+Sharding = Distribute data across servers
+
+MongoDB Atlas = Managed cloud MongoDB service
+
+BACKEND DEVELOPMENT FLOW:
+
+Node.js
+   |
+MongoDB Driver / Mongoose
+   |
+MongoDB Server / Atlas
+   |
+Database
+   |
+Collections
+   |
+Documents
+
+END OF MONGODB NOTES
