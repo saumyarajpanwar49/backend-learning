@@ -1,0 +1,16 @@
+authentication and authorization
+user ko profile dene se pehle ye check karna hota hai ki user hai kon -- authentication
+authorized to perform some tasks which are only allowed to be executed by the admin 
+kin chizo ko karne ke liye permit hai aur kin chizo ko nhi -- authorization
+
+server har baar bhul jata hai ki app kon ho to har baar wo aapse puchega aap kon ho this is the problem matlab har baar server ko batna padega ki tum kon ho
+
+to overcome this we have cookies and session concept isme vo string ke bare me batna 
+
+sabse pehle kuchh cheeje seekhni hai alagh alagh
+    i)cookie kese set karte hai
+    ii)bcrypt kaise use karte hai for password encrytption and descryption
+    iii)jwt kya hai and jwt me kaise kaise store kare and bahar nikale
+
+cover all authorization and authentication things jese google
+jwt teen hisso se banta hai -- HEADER->Algorithm and token type(redincolor)  PAYLOAD->data(purpleincolor)   VERIFY SIGNATURE->signature(skyblueincolor)

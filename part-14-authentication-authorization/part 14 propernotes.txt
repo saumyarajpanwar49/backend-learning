@@ -1,0 +1,2078 @@
+AUTHENTICATION & AUTHORIZATION
+COMPLETE NOTES: BASIC TO INDUSTRY LEVEL
+TECH STACK: NODE.JS + EXPRESS + MONGODB
+
+============================================================
+1. AUTHENTICATION VS AUTHORIZATION
+============================================================
+
+1. CONCEPT
+
+Authentication = WHO ARE YOU?
+User ki identity verify karna.
+
+Authorization = WHAT CAN YOU DO?
+User ko kis action ki permission hai, ye check karna.
+
+2. REAL-LIFE EXAMPLE
+
+Bank:
+Authentication = Verify karna ki tum account holder ho.
+Authorization = Check karna ki tumhe money transfer karne ki permission hai.
+
+3. HOW IT WORKS
+
+User login -> Identity verify -> Authentication successful.
+Protected action -> Permission check -> Allow/Deny.
+
+4. CODE IMPLEMENTATION
+
+if (user.role === "admin") {
+    console.log("Access Granted");
+}
+
+5. IMPORTANT PROPERTIES
+
+- Authentication: Identity verification.
+- Authorization: Permission verification.
+- Roles and permissions.
+- Resource-level access.
+
+6. SECURITY CONSIDERATIONS
+
+Frontend ke role checks par trust mat karo.
+Backend par permissions verify karo.
+
+7. INDUSTRY BEST PRACTICES
+
+Authentication aur Authorization separate rakho.
+Principle of Least Privilege follow karo.
+
+
+============================================================
+2. HTTP STATELESSNESS
+============================================================
+
+1. CONCEPT
+
+HTTP stateless protocol hai.
+Server automatically previous request remember nahi karta.
+
+2. REAL-LIFE EXAMPLE
+
+Har baar restaurant mein jaakar waiter ko apna naam batana.
+
+3. HOW IT WORKS
+
+Request 1: POST /login
+Response: Login Successful.
+
+Request 2: GET /profile
+Server automatically nahi jaanta ki user kaun hai.
+
+4. CODE IMPLEMENTATION
+
+app.get("/profile", (req, res) => {
+    res.send("Profile");
+});
+
+5. IMPORTANT PROPERTIES
+
+- Independent requests.
+- No automatic memory.
+- Authentication state separately maintain hoti hai.
+
+6. SECURITY CONSIDERATIONS
+
+Client ki identity blindly trust mat karo.
+
+7. INDUSTRY BEST PRACTICES
+
+Sessions ya Tokens use karo.
+Har protected request verify karo.
+
+
+============================================================
+3. COOKIES
+============================================================
+
+1. CONCEPT
+
+Cookie browser mein stored small data hota hai.
+Browser matching requests ke saath cookie server ko bhejta hai.
+
+2. REAL-LIFE EXAMPLE
+
+Hotel ka access card jo tumhe baar-baar identity batane se bachata hai.
+
+3. HOW IT WORKS
+
+Server -> Set-Cookie header -> Browser stores cookie.
+Next request -> Browser sends Cookie header.
+Server -> Cookie verify karta hai.
+
+4. CODE IMPLEMENTATION
+
+npm install express cookie-parser
+
+const cookieParser = require("cookie-parser");
+
+app.use(cookieParser());
+
+app.get("/login", (req, res) => {
+
+    res.cookie("sessionId", "random-value", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "lax",
+        maxAge: 3600000
+    });
+
+    res.send("Cookie Set");
+
+});
+
+app.get("/profile", (req, res) => {
+    console.log(req.cookies.sessionId);
+});
+
+5. IMPORTANT PROPERTIES
+
+- HttpOnly
+- Secure
+- SameSite
+- Max-Age
+- Expires
+- Domain
+- Path
+
+6. SECURITY CONSIDERATIONS
+
+Password cookie mein store mat karo.
+HTTPS use karo.
+Cookie-based authentication mein CSRF protection lagao.
+
+7. INDUSTRY BEST PRACTICES
+
+HttpOnly + Secure + suitable SameSite.
+Random session identifiers use karo.
+
+
+============================================================
+4. SESSIONS
+============================================================
+
+1. CONCEPT
+
+Session server-side stored user authentication state hai.
+
+Browser mein generally sirf Session ID store hoti hai.
+
+2. REAL-LIFE EXAMPLE
+
+Gym membership card.
+Card number se system tumhara membership record find karta hai.
+
+3. HOW IT WORKS
+
+1. User login karta hai.
+2. Server credentials verify karta hai.
+3. Server session create karta hai.
+4. Session database/store mein save hota hai.
+5. Session ID cookie browser ko milti hai.
+6. Next request mein Session ID server ko milti hai.
+7. Server session find karke user identify karta hai.
+
+FLOW:
+
+Browser -> Session ID -> Server
+Server -> Session Store -> User Details
+
+4. CODE IMPLEMENTATION
+
+npm install express-session
+
+const session = require("express-session");
+
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        httpOnly: true,
+        secure: true,
+        sameSite: "lax",
+        maxAge: 3600000
+    }
+}));
+
+app.post("/login", (req, res) => {
+
+    req.session.userId = "123";
+
+    res.send("Login Successful");
+
+});
+
+app.get("/profile", (req, res) => {
+
+    if (!req.session.userId) {
+        return res.send("Unauthorized");
+    }
+
+    res.send("Welcome User");
+
+});
+
+IMPORTANT:
+Default MemoryStore production ke liye suitable nahi hai.
+Redis ya database-backed session store use karo.
+
+5. IMPORTANT PROPERTIES
+
+- Session ID
+- Session Store
+- Session Expiry
+- Session Regeneration
+- Session Destruction
+
+6. SECURITY CONSIDERATIONS
+
+- Session fixation attack se protection.
+- Session ID unpredictable honi chahiye.
+- Login ke baad session regenerate karo.
+- Logout par session destroy karo.
+
+7. INDUSTRY BEST PRACTICES
+
+Redis-based session store use kar sakte ho.
+Idle timeout aur absolute timeout rakho.
+Sensitive actions par session re-authentication consider karo.
+
+
+============================================================
+5. PASSWORD HASHING - BCRYPT
+============================================================
+
+1. CONCEPT
+
+Password ko database mein plain text store nahi karna chahiye.
+
+Bcrypt password hashing algorithm hai.
+
+IMPORTANT:
+Hashing one-way process hai.
+Encryption reversible hoti hai, hashing normally reversible nahi hoti.
+
+2. REAL-LIFE EXAMPLE
+
+Tumhare ghar ki key ka original duplicate store karne ke bajaye uska secure verification fingerprint store karna.
+
+3. HOW IT WORKS
+
+Registration:
+Password -> Bcrypt + Salt -> Hash -> Database.
+
+Login:
+Entered Password + Stored Hash -> Compare -> Match/No Match.
+
+4. CODE IMPLEMENTATION
+
+npm install bcrypt
+
+const bcrypt = require("bcrypt");
+
+app.post("/register", async (req, res) => {
+
+    const { password } = req.body;
+
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    // Save hashedPassword in database
+
+    res.send("Registered");
+
+});
+
+LOGIN:
+
+app.post("/login", async (req, res) => {
+
+    const { password } = req.body;
+
+    const isMatch = await bcrypt.compare(
+        password,
+        storedHash
+    );
+
+    if (!isMatch) {
+        return res.status(401).send("Invalid Credentials");
+    }
+
+    res.send("Login Successful");
+
+});
+
+5. IMPORTANT PROPERTIES
+
+- Salt: Random value added during hashing.
+- Cost Factor: Computational difficulty.
+- Hash: Stored password representation.
+- Compare: Password verification.
+
+6. SECURITY CONSIDERATIONS
+
+- Plain passwords store mat karo.
+- Password ko decrypt karne ki koshish mat karo.
+- Login rate limiting lagao.
+- bcrypt ki 72-byte input limit samjho.
+
+7. INDUSTRY BEST PRACTICES
+
+Argon2id generally preferred modern password hashing choice hai.
+Bcrypt bhi widely used hai.
+Appropriate cost factor benchmark karo.
+Password hashes aur database credentials protect karo.
+
+
+============================================================
+6. SALT IN PASSWORD HASHING
+============================================================
+
+1. CONCEPT
+
+Salt ek random value hai jo password hashing se pehle use hoti hai.
+
+2. REAL-LIFE EXAMPLE
+
+Do students ka same password hai, lekin unke fingerprints alag hain.
+
+3. HOW IT WORKS
+
+Password + Random Salt -> Hash.
+
+Same password hone ke bawajood alag salts se different hashes milte hain.
+
+4. CODE IMPLEMENTATION
+
+const salt = await bcrypt.genSalt(12);
+
+const hash = await bcrypt.hash(password, salt);
+
+5. IMPORTANT PROPERTIES
+
+- Random.
+- Unique per password.
+- Password hash ke saath encoded.
+- Rainbow table attacks ko difficult banata hai.
+
+6. SECURITY CONSIDERATIONS
+
+Same salt sabhi users ke liye use mat karo.
+
+7. INDUSTRY BEST PRACTICES
+
+Bcrypt ya Argon2id libraries se automatic salt generation use karo.
+
+
+============================================================
+7. JWT - JSON WEB TOKEN
+============================================================
+
+1. CONCEPT
+
+JWT ek compact token format hai jo claims ko securely represent karta hai.
+
+JWT commonly stateless authentication mein use hota hai.
+
+2. REAL-LIFE EXAMPLE
+
+Airport boarding pass.
+Usmein passenger aur flight ki information hoti hai.
+Staff verify karta hai ki pass valid hai.
+
+3. HOW IT WORKS
+
+1. User login karta hai.
+2. Server credentials verify karta hai.
+3. Server JWT generate karta hai.
+4. Client token store karta hai.
+5. Client next request mein token bhejta hai.
+6. Server signature aur expiry verify karta hai.
+
+JWT STRUCTURE:
+
+HEADER.PAYLOAD.SIGNATURE
+
+HEADER:
+Algorithm aur token type.
+
+PAYLOAD:
+User ID, role, expiry jaise claims.
+
+SIGNATURE:
+Token integrity verify karne ke liye.
+
+4. CODE IMPLEMENTATION
+
+npm install jsonwebtoken
+
+const jwt = require("jsonwebtoken");
+
+const token = jwt.sign(
+    {
+        userId: "123",
+        role: "user"
+    },
+    process.env.JWT_SECRET,
+    {
+        expiresIn: "15m"
+    }
+);
+
+VERIFY:
+
+const decoded = jwt.verify(
+    token,
+    process.env.JWT_SECRET
+);
+
+console.log(decoded.userId);
+
+5. IMPORTANT PROPERTIES
+
+- Header
+- Payload
+- Signature
+- Expiration (exp)
+- Issuer (iss)
+- Audience (aud)
+- Subject (sub)
+- Issued At (iat)
+
+6. SECURITY CONSIDERATIONS
+
+JWT payload normally Base64URL encoded hota hai, encrypted nahi.
+Sensitive data payload mein mat rakho.
+Signature verify kiye bina token trust mat karo.
+Algorithm explicitly restrict karo.
+
+7. INDUSTRY BEST PRACTICES
+
+Short-lived access tokens use karo.
+Secure token storage rakho.
+Issuer, audience aur expiry validate karo.
+Token revocation strategy plan karo.
+
+
+============================================================
+8. ACCESS TOKEN
+============================================================
+
+1. CONCEPT
+
+Access Token protected APIs access karne ke liye use hota hai.
+
+2. REAL-LIFE EXAMPLE
+
+Movie ticket jo limited time aur specific show ke liye valid hai.
+
+3. HOW IT WORKS
+
+Login -> Access Token -> API Request -> Token Verification -> Response.
+
+4. CODE IMPLEMENTATION
+
+const token = jwt.sign(
+    { userId: user._id },
+    process.env.JWT_SECRET,
+    { expiresIn: "15m" }
+);
+
+Client request:
+
+Authorization: Bearer ACCESS_TOKEN
+
+5. IMPORTANT PROPERTIES
+
+- Short expiry.
+- API access.
+- Identity claims.
+- Signature verification.
+
+6. SECURITY CONSIDERATIONS
+
+Token leak hone par attacker expiry tak use kar sakta hai.
+Token logs mein expose mat karo.
+
+7. INDUSTRY BEST PRACTICES
+
+Short lifetime rakho.
+HTTPS use karo.
+Token ko securely store karo.
+
+
+============================================================
+9. REFRESH TOKEN
+============================================================
+
+1. CONCEPT
+
+Refresh Token ka use naya Access Token generate karne ke liye hota hai.
+
+2. REAL-LIFE EXAMPLE
+
+Long-term membership card se short-term entry pass renew karna.
+
+3. HOW IT WORKS
+
+1. Login par Access + Refresh Token issue.
+2. Access Token expire hota hai.
+3. Client Refresh Token bhejta hai.
+4. Server Refresh Token validate karta hai.
+5. Naya Access Token issue hota hai.
+6. Refresh Token rotation bhi ki ja sakti hai.
+
+4. CODE IMPLEMENTATION
+
+const accessToken = jwt.sign(
+    { userId: user._id },
+    process.env.JWT_SECRET,
+    { expiresIn: "15m" }
+);
+
+const refreshToken = jwt.sign(
+    { userId: user._id, type: "refresh" },
+    process.env.REFRESH_SECRET,
+    { expiresIn: "7d" }
+);
+
+IMPORTANT:
+Production implementation mein refresh token ko database mein hashed form mein store karke rotation aur revocation manage karo.
+
+5. IMPORTANT PROPERTIES
+
+- Longer lifetime.
+- Access Token renewal.
+- Rotation.
+- Expiry.
+- Revocation.
+
+6. SECURITY CONSIDERATIONS
+
+Refresh Token sabse sensitive credentials mein se ek hai.
+Reuse detection implement karo.
+Token theft se protection rakho.
+
+7. INDUSTRY BEST PRACTICES
+
+Refresh Token rotation.
+Token family tracking.
+Secure HttpOnly cookie.
+Logout aur password change par revocation.
+
+
+============================================================
+10. AUTHENTICATION MIDDLEWARE
+============================================================
+
+1. CONCEPT
+
+Middleware request aur response ke beech execute hone wala function hai.
+
+Authentication Middleware check karta hai ki user authenticated hai ya nahi.
+
+2. REAL-LIFE EXAMPLE
+
+Office security guard jo entry se pehle ID check karta hai.
+
+3. HOW IT WORKS
+
+Request -> Middleware -> Verify Token -> Attach User -> Controller.
+
+Invalid token -> 401 Unauthorized.
+
+4. CODE IMPLEMENTATION
+
+const authenticate = (req, res, next) => {
+
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+        return res.status(401).send("Unauthorized");
+    }
+
+    const token = authHeader.split(" ")[1];
+
+    try {
+
+        const decoded = jwt.verify(
+            token,
+            process.env.JWT_SECRET
+        );
+
+        req.user = decoded;
+
+        next();
+
+    } catch (error) {
+
+        return res.status(401).send("Invalid Token");
+
+    }
+
+};
+
+app.get("/profile", authenticate, (req, res) => {
+
+    res.send(`Welcome ${req.user.userId}`);
+
+});
+
+5. IMPORTANT PROPERTIES
+
+- req
+- res
+- next()
+- Token verification
+- Request user attachment
+
+6. SECURITY CONSIDERATIONS
+
+Missing, invalid aur expired tokens reject karo.
+Unverified JWT payload use mat karo.
+
+7. INDUSTRY BEST PRACTICES
+
+Reusable authentication middleware.
+Centralized error handling.
+Consistent 401 responses.
+
+
+============================================================
+11. AUTHORIZATION MIDDLEWARE
+============================================================
+
+1. CONCEPT
+
+Authorization Middleware user ki permission check karta hai.
+
+2. REAL-LIFE EXAMPLE
+
+Office employee ID valid hai, lekin server room mein jaane ki permission nahi hai.
+
+3. HOW IT WORKS
+
+Request -> Authentication -> Authorization -> Controller.
+
+Authentication failure = 401.
+Authorization failure = 403.
+
+4. CODE IMPLEMENTATION
+
+const authorizeAdmin = (req, res, next) => {
+
+    if (req.user.role !== "admin") {
+        return res.status(403).send("Forbidden");
+    }
+
+    next();
+
+};
+
+app.delete(
+    "/users/:id",
+    authenticate,
+    authorizeAdmin,
+    deleteUser
+);
+
+5. IMPORTANT PROPERTIES
+
+- Role verification.
+- Permission verification.
+- Resource access.
+- 403 Forbidden.
+
+6. SECURITY CONSIDERATIONS
+
+Role frontend se accept mat karo.
+Database ke trusted user record se permissions establish karo.
+
+7. INDUSTRY BEST PRACTICES
+
+Centralized authorization middleware.
+Every sensitive API par access checks.
+Resource ownership verification.
+
+
+============================================================
+12. RBAC - ROLE BASED ACCESS CONTROL
+============================================================
+
+1. CONCEPT
+
+RBAC mein users ko roles assign kiye jaate hain.
+Roles ke through permissions milti hain.
+
+2. REAL-LIFE EXAMPLE
+
+Company:
+Admin, Manager, Employee.
+
+Har role ki different permissions hoti hain.
+
+3. HOW IT WORKS
+
+User -> Role -> Permissions -> Allowed Actions.
+
+4. CODE IMPLEMENTATION
+
+const authorize = (...roles) => {
+
+    return (req, res, next) => {
+
+        if (!roles.includes(req.user.role)) {
+            return res.sendStatus(403);
+        }
+
+        next();
+
+    };
+
+};
+
+app.get(
+    "/admin",
+    authenticate,
+    authorize("admin"),
+    adminController
+);
+
+5. IMPORTANT PROPERTIES
+
+- Roles.
+- Permissions.
+- Role assignment.
+- Access policies.
+
+6. SECURITY CONSIDERATIONS
+
+Users ko apne roles modify karne mat do.
+Role changes securely manage karo.
+
+7. INDUSTRY BEST PRACTICES
+
+Admin, Manager, User jaise roles define karo.
+Complex systems mein permissions ko roles se separate rakho.
+
+
+============================================================
+13. PERMISSION-BASED ACCESS CONTROL
+============================================================
+
+1. CONCEPT
+
+User ko specific permissions ke basis par access dena.
+
+RBAC se zyada granular control milta hai.
+
+2. REAL-LIFE EXAMPLE
+
+Employee:
+Read reports = Allowed.
+Delete reports = Not Allowed.
+
+3. HOW IT WORKS
+
+User -> Permissions -> Action Check -> Allow/Deny.
+
+4. CODE IMPLEMENTATION
+
+const authorizePermission = (permission) => {
+
+    return (req, res, next) => {
+
+        if (!req.user.permissions?.includes(permission)) {
+            return res.sendStatus(403);
+        }
+
+        next();
+
+    };
+
+};
+
+app.delete(
+    "/reports/:id",
+    authenticate,
+    authorizePermission("report:delete"),
+    deleteReport
+);
+
+5. IMPORTANT PROPERTIES
+
+- Fine-grained access.
+- Read/Write/Delete.
+- Permission assignment.
+- Permission inheritance.
+
+6. SECURITY CONSIDERATIONS
+
+Permissions server-controlled honi chahiye.
+Sensitive permissions carefully assign karo.
+
+7. INDUSTRY BEST PRACTICES
+
+Permission naming convention:
+user:read
+user:update
+user:delete
+report:create
+report:delete
+
+
+============================================================
+14. RESOURCE OWNERSHIP / IDOR
+============================================================
+
+1. CONCEPT
+
+User ko sirf apne resources access karne dena.
+
+IDOR = Insecure Direct Object Reference.
+
+2. REAL-LIFE EXAMPLE
+
+Ek student doosre student ke private marks URL change karke dekh le.
+
+3. HOW IT WORKS
+
+Request mein resource ID aati hai.
+Server check karta hai ki resource requesting user ki hai ya nahi.
+
+4. CODE IMPLEMENTATION
+
+const order = await Order.findOne({
+    _id: req.params.id,
+    userId: req.user.userId
+});
+
+if (!order) {
+    return res.sendStatus(404);
+}
+
+5. IMPORTANT PROPERTIES
+
+- Ownership.
+- Resource ID.
+- User ID.
+- Object-level authorization.
+
+6. SECURITY CONSIDERATIONS
+
+Sirf MongoDB ObjectId ko unpredictable samajhkar secure mat maano.
+ID guessing aur IDOR dono possible hain.
+
+7. INDUSTRY BEST PRACTICES
+
+Database query mein ownership enforce karo.
+Har object-level API par authorization check karo.
+
+
+============================================================
+15. OAUTH 2.0
+============================================================
+
+1. CONCEPT
+
+OAuth 2.0 ek authorization framework hai.
+Ye third-party application ko limited access grant karne mein help karta hai.
+
+2. REAL-LIFE EXAMPLE
+
+Tum kisi app ko Google Drive ki files read karne ki permission dete ho bina Google password share kiye.
+
+3. HOW IT WORKS
+
+1. User third-party login/consent flow start karta hai.
+2. Authorization Server consent leta hai.
+3. Authorization Code milta hai.
+4. Backend code exchange karta hai.
+5. Access Token milta hai.
+6. Allowed resources access hote hain.
+
+4. CODE IMPLEMENTATION
+
+Google OAuth ke liye commonly Passport.js ya Google Identity Services use kar sakte ho.
+
+npm install passport passport-google-oauth20
+
+OAuth strategy mein client ID, client secret aur callback URL configure kiye jaate hain.
+
+5. IMPORTANT PROPERTIES
+
+- Authorization Server.
+- Client.
+- Resource Server.
+- Scope.
+- Access Token.
+- Authorization Code.
+- Redirect URI.
+
+6. SECURITY CONSIDERATIONS
+
+- State parameter validate karo.
+- Exact redirect URI register karo.
+- PKCE use karo, especially public clients.
+- Client Secret expose mat karo.
+
+7. INDUSTRY BEST PRACTICES
+
+Authorization Code Flow + PKCE prefer karo.
+Minimum required scopes maango.
+OAuth access token ko password replacement mat samjho.
+
+
+============================================================
+16. GOOGLE LOGIN / OPENID CONNECT
+============================================================
+
+1. CONCEPT
+
+Google Login generally OpenID Connect (OIDC) use karta hai.
+
+OIDC, OAuth 2.0 ke upar authentication layer hai.
+
+OAuth = Authorization.
+OIDC = Authentication.
+
+2. REAL-LIFE EXAMPLE
+
+Google tumhari identity verify karke website ko batata hai ki tum authenticated user ho.
+
+3. HOW IT WORKS
+
+1. User Continue with Google click karta hai.
+2. Google authentication page open hota hai.
+3. User consent/authentication complete karta hai.
+4. Application ko ID Token milta hai.
+5. Backend token verify karta hai.
+6. Google ki verified identity se account find/create hota hai.
+7. Application apna session ya token issue karti hai.
+
+4. CODE IMPLEMENTATION
+
+npm install google-auth-library
+
+const { OAuth2Client } = require("google-auth-library");
+
+const client = new OAuth2Client(
+    process.env.GOOGLE_CLIENT_ID
+);
+
+async function verifyGoogleToken(idToken) {
+
+    const ticket = await client.verifyIdToken({
+        idToken,
+        audience: process.env.GOOGLE_CLIENT_ID
+    });
+
+    const payload = ticket.getPayload();
+
+    return {
+        googleId: payload.sub,
+        email: payload.email,
+        emailVerified: payload.email_verified
+    };
+
+}
+
+5. IMPORTANT PROPERTIES
+
+- ID Token.
+- Google Client ID.
+- Client Secret.
+- Redirect URI.
+- Scope.
+- Subject (sub).
+- Email verification.
+
+6. SECURITY CONSIDERATIONS
+
+ID Token ko decode karna enough nahi hai.
+Signature, issuer, audience aur expiry verify karo.
+Google ID ko stable identity identifier samjho.
+
+7. INDUSTRY BEST PRACTICES
+
+Official Google libraries use karo.
+Verified email check karo.
+Accounts ko securely link karo.
+Apni application ka session independently manage karo.
+
+
+============================================================
+17. CSRF - CROSS SITE REQUEST FORGERY
+============================================================
+
+1. CONCEPT
+
+Attacker victim ke authenticated browser se unwanted request execute karwane ki koshish karta hai.
+
+2. REAL-LIFE EXAMPLE
+
+Tum bank mein logged in ho.
+Attacker tumhe malicious website par bhejta hai jo tumhare browser se transfer request karwati hai.
+
+3. HOW IT WORKS
+
+1. User legitimate website mein logged in hai.
+2. Browser authentication cookie store karta hai.
+3. User malicious website visit karta hai.
+4. Malicious page target website ko request bhejne ki koshish karta hai.
+5. Browser cookie automatically attach kar sakta hai.
+6. CSRF protection na ho to unwanted action execute ho sakta hai.
+
+4. CODE IMPLEMENTATION
+
+Conceptual validation:
+
+if (req.body.csrfToken !== req.session.csrfToken) {
+    return res.sendStatus(403);
+}
+
+Production mein established CSRF library aur framework protections use karo.
+
+5. IMPORTANT PROPERTIES
+
+- CSRF Token.
+- SameSite Cookie.
+- Origin Validation.
+- Referer Validation.
+
+6. SECURITY CONSIDERATIONS
+
+State-changing GET requests mat banao.
+Cookie authentication mein CSRF risk samjho.
+
+7. INDUSTRY BEST PRACTICES
+
+CSRF tokens use karo.
+SameSite configure karo.
+Origin/Referer validate karo.
+Sensitive state-changing operations protect karo.
+
+
+============================================================
+18. XSS - CROSS SITE SCRIPTING
+============================================================
+
+1. CONCEPT
+
+Attacker website mein malicious JavaScript execute karwane ki koshish karta hai.
+
+2. REAL-LIFE EXAMPLE
+
+Comment box mein attacker script inject karta hai jo doosre users ke browser mein execute hoti hai.
+
+3. HOW IT WORKS
+
+1. Attacker malicious input submit karta hai.
+2. Application input ko unsafe render karti hai.
+3. Browser script execute kar deta hai.
+4. Attacker user ke browser context ka misuse kar sakta hai.
+
+4. CODE IMPLEMENTATION
+
+Unsafe:
+
+element.innerHTML = userInput;
+
+Safer:
+
+element.textContent = userInput;
+
+Express:
+
+npm install helmet
+
+app.use(helmet());
+
+5. IMPORTANT PROPERTIES
+
+- Stored XSS.
+- Reflected XSS.
+- DOM-Based XSS.
+- Content Security Policy.
+
+6. SECURITY CONSIDERATIONS
+
+User input blindly HTML mein render mat karo.
+HttpOnly cookies XSS ke through cookie reading ko reduce karti hain, lekin XSS ko stop nahi karti.
+
+7. INDUSTRY BEST PRACTICES
+
+Output encoding.
+Input validation.
+Safe HTML sanitization.
+Content Security Policy.
+Helmet security headers.
+
+
+============================================================
+19. PASSWORD RESET
+============================================================
+
+1. CONCEPT
+
+User password bhoolne par securely password reset kar sakta hai.
+
+2. REAL-LIFE EXAMPLE
+
+Bank ka Forgot Password feature.
+
+3. HOW IT WORKS
+
+1. User email enter karta hai.
+2. Server reset token generate karta hai.
+3. Token ka hash database mein save hota hai.
+4. Reset link email se bheja jata hai.
+5. User link open karta hai.
+6. Server token aur expiry verify karta hai.
+7. New password hash karke save hota hai.
+8. Reset token invalidate hota hai.
+
+4. CODE IMPLEMENTATION
+
+const crypto = require("crypto");
+
+const resetToken = crypto.randomBytes(32).toString("hex");
+
+const hashedToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+5. IMPORTANT PROPERTIES
+
+- Random Token.
+- Token Hash.
+- Expiry.
+- Single Use.
+- Email Delivery.
+
+6. SECURITY CONSIDERATIONS
+
+Reset token database mein plain text store mat karo.
+Token short-lived aur single-use rakho.
+Email enumeration prevent karo.
+
+7. INDUSTRY BEST PRACTICES
+
+Generic response:
+"If the account exists, reset instructions have been sent."
+
+Password reset ke baad existing sessions revoke karne ka option do.
+
+
+============================================================
+20. EMAIL VERIFICATION
+============================================================
+
+1. CONCEPT
+
+Verify karna ki user email address access kar sakta hai.
+
+2. REAL-LIFE EXAMPLE
+
+Account banane ke baad email par verification link milna.
+
+3. HOW IT WORKS
+
+Registration -> Verification Token -> Email -> User Click -> Token Verify -> Account Verified.
+
+4. CODE IMPLEMENTATION
+
+const crypto = require("crypto");
+
+const token = crypto.randomBytes(32).toString("hex");
+
+const tokenHash = crypto
+    .createHash("sha256")
+    .update(token)
+    .digest("hex");
+
+Database mein tokenHash aur expiry store karo.
+
+5. IMPORTANT PROPERTIES
+
+- Verification Token.
+- Expiry.
+- Single Use.
+- Verified Status.
+
+6. SECURITY CONSIDERATIONS
+
+Token random aur unpredictable rakho.
+Expired tokens reject karo.
+
+7. INDUSTRY BEST PRACTICES
+
+Email verification ke bina sensitive features restrict kar sakte ho.
+Resend rate limiting lagao.
+
+
+============================================================
+21. MFA - MULTI FACTOR AUTHENTICATION
+============================================================
+
+1. CONCEPT
+
+Login ke liye multiple independent verification factors use karna.
+
+2. REAL-LIFE EXAMPLE
+
+Password + Authenticator App OTP.
+
+3. HOW IT WORKS
+
+1. User password enter karta hai.
+2. Password verify hota hai.
+3. Second factor verify hota hai.
+4. Login complete hota hai.
+
+4. CODE IMPLEMENTATION
+
+TOTP ke liye:
+
+npm install otplib
+
+const { generateSecret, verify } = require("otplib");
+
+const secret = generateSecret();
+
+// Verify user-provided TOTP using
+// the stored secret and library's
+// supported verification API.
+
+5. IMPORTANT PROPERTIES
+
+- Something you know: Password.
+- Something you have: Authenticator device.
+- Something you are: Biometrics.
+- TOTP.
+- Recovery Codes.
+- WebAuthn / Passkeys.
+
+6. SECURITY CONSIDERATIONS
+
+OTP brute force prevent karo.
+Recovery codes protect karo.
+SMS OTP SIM-swap attacks ke liye vulnerable ho sakta hai.
+
+7. INDUSTRY BEST PRACTICES
+
+Authenticator apps ya Passkeys prefer karo.
+High-risk actions par MFA require karo.
+Recovery process securely design karo.
+
+
+============================================================
+22. RATE LIMITING
+============================================================
+
+1. CONCEPT
+
+Ek IP ya user kitni requests bhej sakta hai, uski limit set karna.
+
+2. REAL-LIFE EXAMPLE
+
+Bank ATM par limited incorrect PIN attempts.
+
+3. HOW IT WORKS
+
+1. Request count track hota hai.
+2. Limit check hoti hai.
+3. Limit cross hone par request reject hoti hai.
+4. Time window ke baad limit reset hoti hai.
+
+4. CODE IMPLEMENTATION
+
+npm install express-rate-limit
+
+const rateLimit = require("express-rate-limit");
+
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 5,
+    message: "Too many login attempts"
+});
+
+app.use("/login", loginLimiter);
+
+5. IMPORTANT PROPERTIES
+
+- Window.
+- Request Limit.
+- IP Tracking.
+- User Tracking.
+- 429 Too Many Requests.
+
+6. SECURITY CONSIDERATIONS
+
+Brute force attacks prevent karo.
+Proxy configuration correctly set karo.
+
+7. INDUSTRY BEST PRACTICES
+
+Redis-backed distributed rate limiting.
+Login, OTP, password reset par separate limits.
+IP + account-based controls.
+
+
+============================================================
+23. LOGOUT AND TOKEN REVOCATION
+============================================================
+
+1. CONCEPT
+
+Logout ka matlab current authentication session ko invalidate karna.
+
+Token revocation ka matlab issued token ki validity khatam karna.
+
+2. REAL-LIFE EXAMPLE
+
+Hotel checkout par room access card deactivate kar dena.
+
+3. HOW IT WORKS
+
+Session:
+Session destroy -> Cookie clear.
+
+JWT:
+Refresh token revoke -> Future access tokens issue nahi honge.
+Already issued JWT expiry tak valid ho sakta hai, unless additional revocation mechanism ho.
+
+4. CODE IMPLEMENTATION
+
+SESSION LOGOUT:
+
+req.session.destroy((err) => {
+
+    if (err) {
+        return res.sendStatus(500);
+    }
+
+    res.clearCookie("connect.sid");
+
+    res.send("Logged Out");
+
+});
+
+JWT:
+Refresh token ko database mein revoked mark karo.
+
+5. IMPORTANT PROPERTIES
+
+- Session Destruction.
+- Token Revocation.
+- Expiry.
+- Token Rotation.
+- Logout.
+
+6. SECURITY CONSIDERATIONS
+
+Sirf frontend se token delete karna complete server-side logout nahi hai.
+Stolen refresh tokens revoke karo.
+
+7. INDUSTRY BEST PRACTICES
+
+Refresh token rotation.
+Logout all devices.
+Password change par session revocation.
+Short-lived access tokens.
+
+
+============================================================
+24. PASSWORD POLICIES
+============================================================
+
+1. CONCEPT
+
+Password creation aur verification ke security rules.
+
+2. REAL-LIFE EXAMPLE
+
+Banking account ke liye strong password requirement.
+
+3. HOW IT WORKS
+
+Registration -> Password Validation -> Hashing -> Database.
+
+4. CODE IMPLEMENTATION
+
+if (password.length < 12) {
+    return res.status(400).send("Password Too Short");
+}
+
+5. IMPORTANT PROPERTIES
+
+- Minimum Length.
+- Password Breach Checking.
+- Password Hashing.
+- Password Reset.
+- MFA.
+
+6. SECURITY CONSIDERATIONS
+
+Common aur compromised passwords reject karo.
+Password plain text store mat karo.
+
+7. INDUSTRY BEST PRACTICES
+
+Long passwords/passphrases allow karo.
+Unnecessary periodic password changes force mat karo.
+Password managers support karo.
+
+
+============================================================
+25. SECURE ENVIRONMENT VARIABLES
+============================================================
+
+1. CONCEPT
+
+Secrets ko source code se alag environment variables mein store karna.
+
+2. REAL-LIFE EXAMPLE
+
+Bank locker ki key ko public place par nahi rakhna.
+
+3. HOW IT WORKS
+
+Secret -> Environment Variable -> Node.js Application.
+
+4. CODE IMPLEMENTATION
+
+npm install dotenv
+
+require("dotenv").config();
+
+const JWT_SECRET = process.env.JWT_SECRET;
+
+5. IMPORTANT PROPERTIES
+
+- .env
+- process.env
+- Secret Management
+- Environment Separation.
+
+6. SECURITY CONSIDERATIONS
+
+GitHub par .env push mat karo.
+Secrets frontend code mein expose mat karo.
+
+7. INDUSTRY BEST PRACTICES
+
+Production Secret Manager use karo.
+Secrets rotate karo.
+Separate development and production credentials rakho.
+
+
+============================================================
+26. INPUT VALIDATION
+============================================================
+
+1. CONCEPT
+
+User se aane wale data ko validate karna.
+
+2. REAL-LIFE EXAMPLE
+
+Registration form mein valid email aur password check karna.
+
+3. HOW IT WORKS
+
+Request -> Validation -> Sanitization where needed -> Controller -> Database.
+
+4. CODE IMPLEMENTATION
+
+npm install zod
+
+const { z } = require("zod");
+
+const schema = z.object({
+    email: z.string().email(),
+    password: z.string().min(12)
+});
+
+const result = schema.safeParse(req.body);
+
+if (!result.success) {
+    return res.status(400).json(result.error);
+}
+
+5. IMPORTANT PROPERTIES
+
+- Type Validation.
+- Required Fields.
+- Length Checks.
+- Format Validation.
+- Schema Validation.
+
+6. SECURITY CONSIDERATIONS
+
+Client-side validation sufficient nahi hai.
+Server-side validation mandatory hai.
+
+7. INDUSTRY BEST PRACTICES
+
+Zod, Joi ya express-validator use karo.
+Database operations mein parameterized queries use karo.
+
+
+============================================================
+27. AUDIT LOGGING
+============================================================
+
+1. CONCEPT
+
+Security-related activities ka record maintain karna.
+
+2. REAL-LIFE EXAMPLE
+
+Bank har transaction ka record maintain karta hai.
+
+3. HOW IT WORKS
+
+Login / Logout / Password Change / Role Change
+-> Audit Event
+-> Secure Logging System.
+
+4. CODE IMPLEMENTATION
+
+console.log({
+    event: "LOGIN_SUCCESS",
+    userId: user._id,
+    timestamp: new Date()
+});
+
+Production mein structured logger use karo.
+
+5. IMPORTANT PROPERTIES
+
+- Event.
+- User ID.
+- Timestamp.
+- IP Address.
+- Action.
+- Result.
+
+6. SECURITY CONSIDERATIONS
+
+Passwords, tokens aur secrets logs mein kabhi mat likho.
+Logs ko unauthorized modification se protect karo.
+
+7. INDUSTRY BEST PRACTICES
+
+Structured logging.
+Centralized log management.
+Sensitive admin actions ka audit.
+
+
+============================================================
+28. CORS
+============================================================
+
+1. CONCEPT
+
+CORS browser security mechanism hai jo control karta hai ki doosre origins se browser requests ko kaise allow kiya jaye.
+
+2. REAL-LIFE EXAMPLE
+
+Ek building ka security gate jo selected visitors ko entry deta hai.
+
+3. HOW IT WORKS
+
+Frontend: localhost:3000
+Backend: localhost:5000
+
+Browser cross-origin request karta hai.
+Backend CORS headers ke through allowed origin specify karta hai.
+
+4. CODE IMPLEMENTATION
+
+npm install cors
+
+const cors = require("cors");
+
+app.use(cors({
+    origin: "https://example.com",
+    credentials: true
+}));
+
+5. IMPORTANT PROPERTIES
+
+- Origin.
+- Methods.
+- Allowed Headers.
+- Credentials.
+- Preflight OPTIONS.
+
+6. SECURITY CONSIDERATIONS
+
+credentials true ke saath wildcard origin use nahi kar sakte.
+CORS authentication ka replacement nahi hai.
+
+7. INDUSTRY BEST PRACTICES
+
+Specific trusted origins allow karo.
+Cookies use karte waqt credentials configuration sahi rakho.
+
+
+============================================================
+29. PASSWORD CHANGE
+============================================================
+
+1. CONCEPT
+
+Authenticated user apna existing password update karta hai.
+
+2. REAL-LIFE EXAMPLE
+
+Banking app mein Change Password feature.
+
+3. HOW IT WORKS
+
+1. User old password enter karta hai.
+2. Server old password verify karta hai.
+3. New password validate hota hai.
+4. New password hash hota hai.
+5. Database update hota hai.
+6. Existing sessions revoke kiye ja sakte hain.
+
+4. CODE IMPLEMENTATION
+
+const isMatch = await bcrypt.compare(
+    oldPassword,
+    user.password
+);
+
+if (!isMatch) {
+    return res.sendStatus(401);
+}
+
+const newHash = await bcrypt.hash(newPassword, 12);
+
+user.password = newHash;
+
+await user.save();
+
+5. IMPORTANT PROPERTIES
+
+- Old Password Verification.
+- New Password Validation.
+- Hashing.
+- Session Revocation.
+
+6. SECURITY CONSIDERATIONS
+
+Password change se pehle identity verify karo.
+New password plain text store mat karo.
+
+7. INDUSTRY BEST PRACTICES
+
+Password change notification bhejo.
+Existing sessions revoke karne ka option do.
+
+
+============================================================
+30. ACCOUNT LOCKOUT
+============================================================
+
+1. CONCEPT
+
+Repeated failed login attempts ke baad temporary account restriction.
+
+2. REAL-LIFE EXAMPLE
+
+ATM mein repeated wrong PIN ke baad temporary blocking.
+
+3. HOW IT WORKS
+
+Failed Attempts -> Threshold -> Temporary Lock -> Recovery.
+
+4. CODE IMPLEMENTATION
+
+if (user.failedAttempts >= 5) {
+    return res.status(429).send("Account Temporarily Locked");
+}
+
+5. IMPORTANT PROPERTIES
+
+- Failed Attempts.
+- Lock Duration.
+- Unlock Time.
+- Recovery.
+
+6. SECURITY CONSIDERATIONS
+
+Permanent lockout attackers ko account denial-of-service karne ka mauka de sakta hai.
+
+7. INDUSTRY BEST PRACTICES
+
+Progressive delays.
+IP-based rate limits.
+Suspicious login detection.
+Secure account recovery.
+
+
+============================================================
+31. DEVICE AND SESSION MANAGEMENT
+============================================================
+
+1. CONCEPT
+
+User ko apne active login sessions aur devices manage karne dena.
+
+2. REAL-LIFE EXAMPLE
+
+Google Account mein logged-in devices dekhna aur unknown device logout karna.
+
+3. HOW IT WORKS
+
+Login -> Session Record -> Device Information -> Session List -> Revoke Session.
+
+4. CODE IMPLEMENTATION
+
+Example session record:
+
+{
+    userId: "123",
+    sessionId: "abc",
+    device: "Chrome",
+    createdAt: new Date(),
+    expiresAt: new Date()
+}
+
+5. IMPORTANT PROPERTIES
+
+- Device Information.
+- Session ID.
+- Last Active.
+- Expiry.
+- Revocation.
+
+6. SECURITY CONSIDERATIONS
+
+Sensitive device information unnecessarily collect mat karo.
+Session IDs expose mat karo.
+
+7. INDUSTRY BEST PRACTICES
+
+Active sessions dashboard.
+Logout from all devices.
+Suspicious login notifications.
+
+
+============================================================
+32. SECURITY HEADERS
+============================================================
+
+1. CONCEPT
+
+HTTP response headers ke through browser security policies configure karna.
+
+2. REAL-LIFE EXAMPLE
+
+Building mein security rules aur restrictions display karna.
+
+3. HOW IT WORKS
+
+Server response mein security headers attach karta hai.
+Browser un rules ko enforce karta hai.
+
+4. CODE IMPLEMENTATION
+
+npm install helmet
+
+const helmet = require("helmet");
+
+app.use(helmet());
+
+5. IMPORTANT PROPERTIES
+
+- Content-Security-Policy.
+- Strict-Transport-Security.
+- X-Content-Type-Options.
+- Referrer-Policy.
+- Frame Protection.
+
+6. SECURITY CONSIDERATIONS
+
+Incorrect CSP application break kar sakti hai.
+HTTPS enforce karo.
+
+7. INDUSTRY BEST PRACTICES
+
+Helmet use karo.
+Security headers test karo.
+Production mein CSP carefully configure karo.
+
+
+============================================================
+33. AUTHENTICATION ARCHITECTURE - INDUSTRY LEVEL
+============================================================
+
+1. CONCEPT
+
+Authentication ke saare components ko combine karke secure login system banana.
+
+2. REAL-LIFE EXAMPLE
+
+Google account:
+Login, verification, devices, security checks, permissions aur logout.
+
+3. HOW IT WORKS
+
+REGISTRATION:
+
+User
+  |
+Validate Input
+  |
+Hash Password
+  |
+Save User
+  |
+Email Verification
+
+LOGIN:
+
+User
+  |
+Validate Credentials
+  |
+Check Password Hash
+  |
+Check MFA (if enabled)
+  |
+Create Session / Issue Tokens
+  |
+Login Success
+
+PROTECTED REQUEST:
+
+Client
+  |
+Cookie / Bearer Token
+  |
+Authentication Middleware
+  |
+User Identification
+  |
+Authorization Middleware
+  |
+Resource Ownership Check
+  |
+Controller
+  |
+Database
+  |
+Response
+
+4. CODE IMPLEMENTATION
+
+Typical project structure:
+
+src/
+ |
+ |-- config/
+ |    |-- database.js
+ |    |-- passport.js
+ |
+ |-- models/
+ |    |-- User.js
+ |    |-- Session.js
+ |
+ |-- middleware/
+ |    |-- authenticate.js
+ |    |-- authorize.js
+ |    |-- validate.js
+ |
+ |-- controllers/
+ |    |-- authController.js
+ |    |-- userController.js
+ |
+ |-- routes/
+ |    |-- authRoutes.js
+ |    |-- userRoutes.js
+ |
+ |-- services/
+ |    |-- authService.js
+ |    |-- emailService.js
+ |
+ |-- utils/
+      |-- token.js
+      |-- password.js
+
+5. IMPORTANT PROPERTIES
+
+- Secure Registration.
+- Login.
+- Logout.
+- Sessions / JWT.
+- Refresh Tokens.
+- RBAC.
+- MFA.
+- Password Reset.
+- Email Verification.
+- Audit Logs.
+
+6. SECURITY CONSIDERATIONS
+
+- SQL/NoSQL Injection.
+- XSS.
+- CSRF.
+- Brute Force.
+- Session Hijacking.
+- Token Theft.
+- IDOR.
+- Privilege Escalation.
+
+7. INDUSTRY BEST PRACTICES
+
+- HTTPS everywhere.
+- Argon2id or bcrypt.
+- Short-lived access tokens.
+- Secure refresh token rotation.
+- HttpOnly Secure cookies.
+- CSRF protection where needed.
+- Rate limiting.
+- Server-side authorization.
+- Least Privilege.
+- Centralized logging.
+- Secret Management.
+- Regular dependency updates.
+
+
+============================================================
+34. IMPORTANT HTTP STATUS CODES
+============================================================
+
+200 = OK
+201 = Created
+400 = Bad Request
+401 = Unauthorized (Authentication required/failed)
+403 = Forbidden (Permission denied)
+404 = Not Found
+409 = Conflict
+422 = Unprocessable Content
+429 = Too Many Requests
+500 = Internal Server Error
+
+
+============================================================
+35. IMPORTANT SECURITY TERMINOLOGY
+============================================================
+
+Hashing:
+One-way transformation used for password storage.
+
+Encryption:
+Data ko key ke through reversible form mein transform karna.
+
+Encoding:
+Data ka representation change karna.
+Example: Base64.
+
+Salt:
+Password hashing ke saath use hone wali random value.
+
+Token:
+Claims ya authorization information carry karne wala credential.
+
+Session:
+Server-side authentication state.
+
+JWT:
+Signed token format.
+
+CSRF:
+Victim ke authenticated browser se unwanted request karwana.
+
+XSS:
+Malicious script browser mein execute karwana.
+
+IDOR:
+Object-level authorization ki weakness.
+
+MFA:
+Multiple authentication factors.
+
+RBAC:
+Role-Based Access Control.
+
+OIDC:
+Authentication layer built on OAuth 2.0.
+
+
+============================================================
+36. FINAL LEARNING ROADMAP
+============================================================
+
+LEVEL 1 - FUNDAMENTALS
+
+1. HTTP Statelessness
+2. Authentication vs Authorization
+3. Cookies
+4. Sessions
+5. Password Hashing
+6. bcrypt / Argon2
+
+LEVEL 2 - TOKEN AUTHENTICATION
+
+7. JWT
+8. Access Tokens
+9. Refresh Tokens
+10. Token Rotation
+11. Authentication Middleware
+12. Logout and Revocation
+
+LEVEL 3 - AUTHORIZATION
+
+13. RBAC
+14. Permission-Based Access
+15. Resource Ownership
+16. IDOR Prevention
+
+LEVEL 4 - ADVANCED AUTHENTICATION
+
+17. OAuth 2.0
+18. OpenID Connect
+19. Google Login
+20. MFA
+21. Passkeys / WebAuthn
+
+LEVEL 5 - SECURITY
+
+22. CSRF
+23. XSS
+24. CORS
+25. Rate Limiting
+26. Password Reset
+27. Email Verification
+28. Account Lockout
+29. Device Management
+30. Security Headers
+31. Audit Logging
+32. Environment Variables
+
+LEVEL 6 - INDUSTRY IMPLEMENTATION
+
+33. Complete Authentication Architecture
+34. Secure API Design
+35. Session and Token Management
+36. Production Deployment
+37. Security Testing
+38. Monitoring and Incident Response
