@@ -1,26 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+    <!-- Defines character encoding as UTF-8 -->
     <meta charset="UTF-8">
+
+    <!-- Makes the website responsive on mobile, tablet and desktop -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Title displayed on the browser tab -->
     <title>Document</title>
 
+    <!-- Connect external CSS file from the public folder -->
     <link rel="stylesheet" href="/stylesheet.css">
+
+    <!-- Load Tailwind CSS directly through CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
+
 <body>
+
+    <!-- Main container -->
+    <!-- w-full = Full width -->
+    <!-- min-h-screen = Minimum height equal to screen height -->
+    <!-- bg-zinc-900 = Dark background -->
+    <!-- p-10 = Padding on all sides -->
+    <!-- text-white = White text color -->
     <div class="w-full min-h-screen bg-zinc-900 p-10 text-white">
+
+        <!-- Navigation section with bottom margin -->
         <div class="nav mb-10">
-            <a class = "text-blue-500" href="/read">Read User</a>
+
+            <!-- Clicking this link redirects to /read route -->
+            <!-- text-blue-500 = Blue text color -->
+            <a class="text-blue-500" href="/read">Read User</a>
+
         </div>
 
+
+        <!-- Main heading -->
+        <!-- text-3xl = Large text -->
+        <!-- tracking-tighter = Decreases letter spacing -->
+        <!-- mb-3 = Bottom margin -->
         <h1 class="text-3xl tracking-tighter mb-3">Create User</h1>
+
+
+        <!-- Form to submit user details -->
+        <!-- action="/create" = Sends form data to /create route -->
+        <!-- method="post" = Sends data using POST request -->
         <form action="/create" method="post">
-            <input class = "px-5 py-2 border-2 border-zinc-800 outline-none rounded-lg bg-transparent " type="text" name = "name" placeholder="name">
-            <input class = "px-5 py-2 border-2 border-zinc-800 outline-none rounded-lg bg-transparent " type="text" name = "email" placeholder="email">
-            <input class = "px-5 py-2 border-2 border-zinc-800 outline-none rounded-lg bg-transparent " type="text" name = "image" placeholder="image url">
-            <input class = "px-5 py-3 bg-blue-500 rounded-lg ml-3" type = "submit" value="Create User">
+
+            <!-- Input field for user's name -->
+            <!-- name="name" identifies the field in req.body -->
+            <input
+                class="px-5 py-2 border-2 border-zinc-800 outline-none rounded-lg bg-transparent"
+                type="text"
+                name="name"
+                placeholder="name"
+            >
+
+            <!-- Input field for user's email -->
+            <input
+                class="px-5 py-2 border-2 border-zinc-800 outline-none rounded-lg bg-transparent"
+                type="text"
+                name="email"
+                placeholder="email"
+            >
+
+            <!-- Input field for user's image URL -->
+            <input
+                class="px-5 py-2 border-2 border-zinc-800 outline-none rounded-lg bg-transparent"
+                type="text"
+                name="image"
+                placeholder="image url"
+            >
+
+            <!-- Submit button -->
+            <!-- Clicking this submits the form -->
+            <!-- bg-blue-500 = Blue background -->
+            <!-- ml-3 = Left margin -->
+            <input
+                class="px-5 py-3 bg-blue-500 rounded-lg ml-3"
+                type="submit"
+                value="Create User"
+            >
+
         </form>
+
     </div>
+
 </body>
 </html>

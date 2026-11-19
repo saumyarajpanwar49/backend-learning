@@ -1,62 +1,119 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
+    <!-- Defines character encoding -->
     <meta charset="UTF-8">
+
+    <!-- Makes webpage responsive on different screen sizes -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Browser tab title -->
     <title>All Users</title>
 
+    <!-- Connect external CSS file from public folder -->
     <link rel="stylesheet" href="/stylesheet.css">
+
+    <!-- Load Tailwind CSS using CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 
 <body>
 
+    <!-- Main container -->
+    <!-- w-full = Full width -->
+    <!-- min-h-screen = Minimum height of screen -->
+    <!-- bg-zinc-900 = Dark background -->
+    <!-- p-10 = Padding -->
+    <!-- text-white = White text -->
     <div class="w-full min-h-screen bg-zinc-900 p-10 text-white">
 
+        <!-- Clicking this takes us back to the home page -->
         <a class="text-blue-500" href="/">Back to Home</a>
 
-        <h1 class="text-3xl mt-10 tracking-tighter mb-3">All Users</h1>
+        <!-- Main heading -->
+        <h1 class="text-3xl mt-10 tracking-tighter mb-3">
+            All Users
+        </h1>
 
+        <!-- Container to display all user cards -->
+        <!-- flex = Displays items using flexbox -->
+        <!-- gap-3 = Space between cards -->
+        <!-- flex-wrap = Moves cards to next line when space is insufficient -->
         <div class="users flex gap-3 flex-wrap">
 
+            <!-- EJS IF CONDITION -->
+            <!-- Checks whether the users array contains any users -->
             <% if (users.length > 0) { %>
 
+                <!-- EJS FOR EACH LOOP -->
+                <!-- Iterates through every user in the users array -->
+                <!-- Each user is stored temporarily in the variable "user" -->
                 <% users.forEach(function(user) { %>
 
+                    <!-- Individual user card -->
                     <div class="user w-72 p-4 bg-zinc-800 rounded-lg">
 
+                        <!-- Image container -->
                         <div class="w-full h-82 rounded-lg bg-zinc-700 overflow-hidden">
-                            <img class="w-full h-full object-cover object-top"
-                                 src="<%= user.image %>" alt="">
+
+                            <!-- Display the current user's image -->
+                            <!-- user.image contains the image URL -->
+                            <!-- object-cover = Fits image inside container -->
+                            <!-- object-top = Positions image from the top -->
+                            <img
+                                class="w-full h-full object-cover object-top"
+                                src="<%= user.image %>"
+                                alt=""
+                            >
+
                         </div>
 
+                        <!-- Display current user's name -->
                         <h3 class="text-xl mt-3 tracking-tighter">
                             <%= user.name %>
                         </h3>
 
+                        <!-- Display current user's email -->
                         <h5 class="text-zinc-500">
                             <%= user.email %>
                         </h5>
 
+                        <!-- Edit and Delete buttons container -->
                         <div class="flex gap-3 mt-10">
-                            <a href="" class="text-zinc-200">Edit User</a>
 
-                            <a href="/delete/<%= user._id %>"
-                               class="text-red-500">Delete User</a>
+                            <!-- Edit user link (currently no route connected) -->
+                            <a href="" class="text-zinc-200">
+                                Edit User
+                            </a>
+
+                            <!-- Delete the current user -->
+                            <!-- user._id dynamically provides that user's MongoDB ID -->
+                            <!-- Clicking this sends a request to /delete/:id -->
+                            <a
+                                href="/delete/<%= user._id %>"
+                                class="text-red-500"
+                            >
+                                Delete User
+                            </a>
+
                         </div>
 
                     </div>
 
+                <!-- End of forEach loop -->
                 <% }) %>
 
+            <!-- ELSE CONDITION -->
+            <!-- Runs when the users array is empty -->
             <% } else { %>
 
+                <!-- Display message when no users exist -->
                 <h3 class="text-zinc-500 text-xl">
                     No Users Found. Create Your First User!
                 </h3>
 
+            <!-- End of if-else condition -->
             <% } %>
 
         </div>
